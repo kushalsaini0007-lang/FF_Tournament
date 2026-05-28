@@ -42,6 +42,8 @@ const tournamentSchema = new mongoose.Schema({
   rules: { type: String, default: 'Standard Rules Apply' },
   adminProfit: { type: Number, default: 0 },
   participants: [participantSchema],
+  roomID: { type: String, default: "" },   
+  roomPass: { type: String, default: "" }, 
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -681,6 +683,23 @@ app.post('/api/admin/distribute-prizes', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Error distributing prizes' });
+  }
+}); // Admin panel se Room ID aur Password update karne ke liye naya rasta
+app.put('/api/tournaments/:id/room-info', async (req, res) => {
+  try {
+    const { roomID, roomPass } = req.body;
+    const matchId = req.params.id;
+
+    const updated = await Tournament.findByIdAndUpdate(
+      matchId,
+      { roomID, roomPass },
+      { new: true }
+    );
+
+    res.json({ message: 'Room ID & Password updated successfully!', updated });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error while updating room info' });
   }
 });
 
