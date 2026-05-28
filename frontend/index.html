@@ -712,9 +712,17 @@
             container.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
             container.innerHTML = dataToRender.map(t => {
                 const progressPercent = Math.min((t.filledSlots / t.totalSlots) * 100, 100);
-                const deleteBtnHTML = isAdminMode 
-                    ? `<button onclick="deleteTournament('${t._id}')" class="mt-4 w-full bg-rose-950/40 hover:bg-rose-900/60 border border-rose-800/60 text-rose-300 py-2 rounded-xl text-xs font-semibold transition">🗑️ Delete Match</button>` 
-                    : '';
+// Check karo ki kya participants array ke andar kisi element ki userId hamare logged-in user ki id se match karti hai
+const hasJoined = t.participants && t.participants.some(p => p.userId === currentUser?.id);
+
+// Baaki ka code bilkul waisa hi rahega jaisa tumne lagaya hai
+const roomInfoHTML = hasJoined && t.roomID && t.roomPass
+    ? `<div class="mt-3 p-3 bg-slate-950/80 border border-emerald-500/40 rounded-xl text-center animate__animated animate__fadeIn">
+        <p class="text-emerald-400 font-bold text-xs uppercase tracking-wider">🔐 Room Credentials</p>
+        <p class="text-slate-300 text-xs mt-1 font-mono">ID: <span class="text-white font-bold">${t.roomID}</span></p>
+        <p class="text-slate-300 text-xs font-mono">PASS: <span class="text-white font-bold">${t.roomPass}</span></p>
+       </div>`
+    : '';                ? `<button onclick="deleteTournament('${t._id || t.id}')" class="mt-4 w-full bg-rose-950/40 hover:bg-rose-900/60 border border-rose-800/60 text-rose-300 py-2 rounded-xl text-xs font-semibold transition">🗑️ Delete Match</button>`
 
                 return `
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition flex flex-col justify-between shadow-sm animate__animated animate__fadeIn">
@@ -746,8 +754,11 @@
                                 <span class="text-slate-400 font-medium block mb-1">📋 Prize Distribution:</span>
                                 <span class="text-slate-300 font-mono">${t.rules || 'Standard Rules Apply'}</span>
                             </div>
-                        </div>
-                        <div>
+                        </div> 
+                        <div> <div>
+    ${roomInfoHTML} <button onclick="openJoinModal('${t._id}', '${t.matchTitle.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-xl text-sm transition tracking-wide">Join Match</button>
+    ${deleteBtnHTML}
+</div>
                             <button onclick="openJoinModal('${t._id}', '${t.matchTitle.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-xl text-sm transition tracking-wide">Join Match</button>
                             ${deleteBtnHTML}
                         </div>
