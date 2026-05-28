@@ -410,10 +410,9 @@
     </div><!-- /appShell -->
 
     <script>
-        // API Base URL (Tumhara local Node.js server port 5000 par running hai)
         const API_URL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'
-    ? 'http://localhost:5000/api'
-    : 'https://ff-tournament-od2c.onrender.com/api';
+            ? 'http://localhost:5000/api'
+            : 'https://ff-tournament-od2c.onrender.com/api';
         const AUTH_STORAGE_KEY = 'nexmillUser';
 
         let currentUser = null;
@@ -492,7 +491,7 @@
                 signupForm.classList.remove('hidden');
                 loginTab.classList.remove('auth-tab-active');
                 loginTab.classList.add('text-slate-300', 'border', 'border-slate-700');
-                signupTab.classList.add('auth-tab-active');
+                signupTab.add('auth-tab-active');
                 signupTab.classList.remove('text-slate-300');
             } else {
                 signupForm.classList.add('hidden');
@@ -608,7 +607,6 @@
             updateUserNav();
         }
 
-        // Custom Notification Toast Function
         function showNotification(title, message, icon = "🎉") {
             const toast = document.getElementById('notificationToast');
             document.getElementById('toastTitle').textContent = title;
@@ -653,7 +651,6 @@
             }
         }
 
-        // 1. BACKEND SE DATA FETCH KARNE KE FUNCTIONS
         async function fetchTournaments() {
             try {
                 const res = await fetch(`${API_URL}/tournaments`);
@@ -700,7 +697,7 @@
             }
         }
 
-        // 2. RENDER FUNCTIONS (UI DISPLAY)
+        // ==================== RENDER ENGINE (FIXED) ====================
         function renderTournaments(dataToRender = tournaments) {
             const container = document.getElementById('tournamentGrid');
             if (dataToRender.length === 0) {
@@ -712,17 +709,19 @@
             container.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
             container.innerHTML = dataToRender.map(t => {
                 const progressPercent = Math.min((t.filledSlots / t.totalSlots) * 100, 100);
-// Check karo ki kya participants array ke andar kisi element ki userId hamare logged-in user ki id se match karti hai
-const hasJoined = t.participants && t.participants.some(p => p.userId === currentUser?.id);
+                const hasJoined = t.participants && t.participants.some(p => p.userId === currentUser?.id);
 
-// Baaki ka code bilkul waisa hi rahega jaisa tumne lagaya hai
-const roomInfoHTML = hasJoined && t.roomID && t.roomPass
-    ? `<div class="mt-3 p-3 bg-slate-950/80 border border-emerald-500/40 rounded-xl text-center animate__animated animate__fadeIn">
-        <p class="text-emerald-400 font-bold text-xs uppercase tracking-wider">🔐 Room Credentials</p>
-        <p class="text-slate-300 text-xs mt-1 font-mono">ID: <span class="text-white font-bold">${t.roomID}</span></p>
-        <p class="text-slate-300 text-xs font-mono">PASS: <span class="text-white font-bold">${t.roomPass}</span></p>
-       </div>`
-    : '';                ? `<button onclick="deleteTournament('${t._id || t.id}')" class="mt-4 w-full bg-rose-950/40 hover:bg-rose-900/60 border border-rose-800/60 text-rose-300 py-2 rounded-xl text-xs font-semibold transition">🗑️ Delete Match</button>`
+                const roomInfoHTML = hasJoined && t.roomID && t.roomPass
+                    ? `<div class="mt-3 p-3 bg-slate-950/80 border border-emerald-500/40 rounded-xl text-center animate__animated animate__fadeIn">
+                        <p class="text-emerald-400 font-bold text-xs uppercase tracking-wider">🔐 Room Credentials</p>
+                        <p class="text-slate-300 text-xs mt-1 font-mono">ID: <span class="text-white font-bold">${t.roomID}</span></p>
+                        <p class="text-slate-300 text-xs font-mono">PASS: <span class="text-white font-bold">${t.roomPass}</span></p>
+                       </div>`
+                    : '';
+
+                const deleteBtnHTML = currentUser?.isAdmin
+                    ? `<button onclick="deleteTournament('${t._id || t.id}')" class="mt-4 w-full bg-rose-950/40 hover:bg-rose-900/60 border border-rose-800/60 text-rose-300 py-2 rounded-xl text-xs font-semibold transition">🗑️ Delete Match</button>`
+                    : '';
 
                 return `
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition flex flex-col justify-between shadow-sm animate__animated animate__fadeIn">
@@ -755,11 +754,9 @@ const roomInfoHTML = hasJoined && t.roomID && t.roomPass
                                 <span class="text-slate-300 font-mono">${t.rules || 'Standard Rules Apply'}</span>
                             </div>
                         </div> 
-                        <div> <div>
-    ${roomInfoHTML} <button onclick="openJoinModal('${t._id}', '${t.matchTitle.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-xl text-sm transition tracking-wide">Join Match</button>
-    ${deleteBtnHTML}
-</div>
-                            <button onclick="openJoinModal('${t._id}', '${t.matchTitle.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-xl text-sm transition tracking-wide">Join Match</button>
+                        <div>
+                            ${roomInfoHTML}
+                            <button onclick="openJoinModal('${t._id}', '${t.matchTitle.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-xl text-sm transition tracking-wide mt-2">Join Match</button>
                             ${deleteBtnHTML}
                         </div>
                     </div>
@@ -855,7 +852,6 @@ const roomInfoHTML = hasJoined && t.roomID && t.roomPass
             }
         }
 
-        // Search & Filter Engine
         function filterTournaments() {
             const searchValue = document.getElementById('searchInput').value.toLowerCase();
             const selectedMap = document.getElementById('mapFilterSelect').value;
@@ -869,7 +865,6 @@ const roomInfoHTML = hasJoined && t.roomID && t.roomPass
             renderTournaments(filtered);
         }
 
-        // 3. REAL ACTIONS (POST & DELETE REQUESTS TO BACKEND)
         function openDepositModal() { if (requireAuth()) document.getElementById('depositModal').classList.remove('hidden'); }
         function closeDepositModal() { document.getElementById('depositModal').classList.add('hidden'); }
 
@@ -1024,7 +1019,7 @@ const roomInfoHTML = hasJoined && t.roomID && t.roomPass
 
                 const matchTitle = activeTournamentTitleForJoin || 'the match';
                 const feeMsg = data.entryFeeDeducted > 0 ? ` ₹${data.entryFeeDeducted} entry fee deducted.` : '';
-                showNotification('Registered!', `${ign} joined "${matchTitle}" successfully!${feeMsg}`, '🎮');
+                showNotification('Registered!', `${ign} joined "${matchTitle}" successfully!${feeMsg}`, 'gane');
 
                 await fetchTournaments();
                 await fetchAdminParticipants();
@@ -1034,7 +1029,6 @@ const roomInfoHTML = hasJoined && t.roomID && t.roomPass
             }
         }
 
-        // Admin Toggle Handler
         document.getElementById('adminToggle').addEventListener('click', function() {
             if (!getCurrentUser()?.isAdmin) {
                 showNotification('Access Denied', 'Admin privileges required.', '🚫');
@@ -1054,7 +1048,6 @@ const roomInfoHTML = hasJoined && t.roomID && t.roomPass
             fetchAdminParticipants();
         });
 
-        // Create Tournament API call
         document.getElementById('publishBtn').addEventListener('click', async function() {
             const titleInput = document.getElementById('matchTitleInput');
             const mapInput = document.getElementById('mapNameInput');
@@ -1091,7 +1084,6 @@ const roomInfoHTML = hasJoined && t.roomID && t.roomPass
             }
         });
 
-        // Declare Winner API call
         document.getElementById('declareWinnerBtn').addEventListener('click', async function() {
             const tName = document.getElementById('winnerTournamentInput');
             const pName = document.getElementById('winnerNameInput');
@@ -1124,7 +1116,6 @@ const roomInfoHTML = hasJoined && t.roomID && t.roomPass
             }
         });
 
-        // Delete Tournament API call
         async function deleteTournament(id) {
             try {
                 await authFetch(`${API_URL}/tournaments/${id}`, { method: 'DELETE' });
@@ -1135,7 +1126,6 @@ const roomInfoHTML = hasJoined && t.roomID && t.roomPass
             }
         }
 
-        // APP INITIALIZATION
         document.addEventListener('DOMContentLoaded', () => {
             initAuth();
             if (getCurrentUser()) {
@@ -1263,34 +1253,33 @@ const roomInfoHTML = hasJoined && t.roomID && t.roomPass
             if (!getCurrentUser()?.isAdmin) return;
             try {
                 const response = await authFetch(`${API_URL}/admin/deposits`);
-        const deposits = await response.json();
-        const depositRequestsContainer = document.getElementById('deposit-requests');
-        if (!depositRequestsContainer) return;
-        
-        depositRequestsContainer.innerHTML = '';
+                const deposits = await response.json();
+                const depositRequestsContainer = document.getElementById('deposit-requests');
+                if (!depositRequestsContainer) return;
+                
+                depositRequestsContainer.innerHTML = '';
 
-        deposits.forEach(deposit => {
-            const statusBadge = deposit.status === 'pending' ? '🟡 Pending' : deposit.status === 'completed' ? '🟢 Completed' : '🔴 Failed';
-            
-            // Database ki real identity _id use hogi action track karne ke liye
-            const actions = deposit.status === 'pending' ? `
-                <button onclick="handleAdminDepositAction('${deposit._id}', 'completed')" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-3 py-1 rounded text-xs transition mr-2">🟢 Approve</button>
-                <button onclick="handleAdminDepositAction('${deposit._id}', 'failed')" class="bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1 rounded text-xs transition">🔴 Reject</button>
-            ` : '<span class="text-slate-500">-</span>';
+                deposits.forEach(deposit => {
+                    const statusBadge = deposit.status === 'pending' ? '🟡 Pending' : deposit.status === 'completed' ? '🟢 Completed' : '🔴 Failed';
+                    
+                    const actions = deposit.status === 'pending' ? `
+                        <button onclick="handleAdminDepositAction('${deposit._id}', 'completed')" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-3 py-1 rounded text-xs transition mr-2">🟢 Approve</button>
+                        <button onclick="handleAdminDepositAction('${deposit._id}', 'failed')" class="bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1 rounded text-xs transition">🔴 Reject</button>
+                    ` : '<span class="text-slate-500">-</span>';
 
-            depositRequestsContainer.innerHTML += `
-                <tr class="hover:bg-slate-700/50 transition border-b border-slate-700">
-                    <td class="py-3 px-4 font-mono">${deposit.uid}</td>
-                    <td class="py-3 px-4 font-mono text-slate-300">${deposit.utr}</td>
-                    <td class="py-3 px-4 text-emerald-400 font-semibold">₹${deposit.amount}</td>
-                    <td class="py-3 px-4">${statusBadge}</td>
-                    <td class="py-3 px-4">${actions}</td>
-                </tr>
-            `;
-        });
-    } catch (error) {
-        console.error('Error fetching admin deposits:', error);
-    }
+                    depositRequestsContainer.innerHTML += `
+                        <tr class="hover:bg-slate-700/50 transition border-b border-slate-700">
+                            <td class="py-3 px-4 font-mono">${deposit.uid}</td>
+                            <td class="py-3 px-4 font-mono text-slate-300">${deposit.utr}</td>
+                            <td class="py-3 px-4 text-emerald-400 font-semibold">₹${deposit.amount}</td>
+                            <td class="py-3 px-4">${statusBadge}</td>
+                            <td class="py-3 px-4">${actions}</td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error fetching admin deposits:', error);
+            }
         }
 
         async function handleAdminDepositAction(requestId, action) {
@@ -1301,20 +1290,19 @@ const roomInfoHTML = hasJoined && t.roomID && t.roomPass
                     body: JSON.stringify({ requestId, action, userId: getCurrentUser().id })
                 });
 
-        if (response.ok) {
-            showNotification('Status Updated', `Deposit request marked as ${action}!`, '✅');
-            fetchAdminDeposits(); // Table refresh karne ke liye
-            if (typeof fetchWallet === 'function') fetchWallet(); // UI par wallet balance update karne ke liye
-        } else {
-            const errData = await response.json();
-            showNotification('Action Failed', errData.message || 'Error processing request', '❌');
-        }
-    } catch (error) {
-        showNotification('Error', 'Unexpected network error occurred.', '❌');
-    }
+                if (response.ok) {
+                    showNotification('Status Updated', `Deposit request marked as ${action}!`, '✅');
+                    fetchAdminDeposits();
+                    if (typeof fetchWallet === 'function') fetchWallet();
+                } else {
+                    const errData = await response.json();
+                    showNotification('Action Failed', errData.message || 'Error processing request', '❌');
+                }
+            } catch (error) {
+                showNotification('Error', 'Unexpected network error occurred.', '❌');
+            }
         }
 
-        // Expose auth handlers for inline onclick usage
         window.handleLogin = handleLogin;
         window.handleSignup = handleSignup;
         window.switchAuthTab = switchAuthTab;
