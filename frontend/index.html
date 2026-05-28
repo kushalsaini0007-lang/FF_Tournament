@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexmilL Free Fire Tournament - Tournament Hub</title>
+    <title>AL Tournament - Tournament Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
@@ -33,9 +33,9 @@
     <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="h-10 w-10 bg-gradient-to-tr from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center font-black text-slate-900 text-lg shadow-lg shadow-emerald-500/20">NL</div>
+                <div class="h-10 w-10 bg-gradient-to-tr from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center font-black text-slate-900 text-lg shadow-lg shadow-emerald-500/20">AL</div>
                 <div>
-                    <h1 class="font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500">NEXMILL ARENA</h1>
+                    <h1 class="font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500">AMIT LIVE ARENA</h1>
                     <p class="text-[10px] text-slate-400 font-medium tracking-widest uppercase">Free Fire Esports Hub</p>
                 </div>
             </div>
@@ -255,16 +255,14 @@
     </main>
 
     <footer class="border-t border-slate-900 bg-slate-950/80 py-4 text-center text-[10px] text-slate-500 font-medium tracking-wide">
-        &copy; 2026 NEXMILL ARENA AUTOMATION HUBS INC. SHIELDED PROTOCOLS FULLY ACTIVE.
+        &copy; 2026 AMIT LIVE ARENA. SHIELDED PROTOCOLS FULLY ACTIVE.
     </footer>
 
     <script>
-        // Automatic runtime dynamic host configuration routing evaluation
         const API_URL = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
             ? 'http://localhost:5000'
             : window.location.origin.replace('3000', '5000');
 
-        // Notification UI Dispatch Engine Broker
         function showNotification(title, message, icon = 'ℹ️') {
             const toast = document.getElementById('notification-toast');
             const tTitle = document.getElementById('toast-title');
@@ -275,7 +273,6 @@
             tDesc.innerText = message;
             tIcon.innerText = icon;
 
-            // Apply styling contextual theme signatures
             if (icon === '❌') {
                 toast.className = "fixed top-5 right-5 z-50 p-4 rounded-xl shadow-2xl border backdrop-blur-md bg-red-950/90 border-red-800/50 text-red-200 animate__animated animate__bounceIn";
             } else if (icon === '✅') {
@@ -290,10 +287,9 @@
             }, 4500);
         }
 
-        // Active Application Session Local Data Broker Proxies
         function getCurrentUser() {
             try {
-                const sessionStr = localStorage.getItem('nexmill_user_session');
+                const sessionStr = localStorage.getItem('amitlive_user_session');
                 return sessionStr ? JSON.parse(sessionStr) : null;
             } catch (e) {
                 return null;
@@ -302,14 +298,13 @@
 
         function setCurrentUser(userObj) {
             if (userObj) {
-                localStorage.setItem('nexmill_user_session', JSON.stringify(userObj));
+                localStorage.setItem('amitlive_user_session', JSON.stringify(userObj));
             } else {
-                localStorage.removeItem('nexmill_user_session');
+                localStorage.removeItem('amitlive_user_session');
             }
             evaluateAuthViewContextState();
         }
 
-        // Secure Request Fetch Framework Injecting Client Metadata Signatures
         async function authFetch(url, options = {}) {
             const user = getCurrentUser();
             options.headers = {
@@ -322,7 +317,6 @@
             return fetch(url, options);
         }
 
-        // Authentication View State Evaluation Matrix Loop
         function evaluateAuthViewContextState() {
             const user = getCurrentUser();
             const headerAuthZone = document.getElementById('header-auth-zone');
@@ -350,7 +344,6 @@
                     tabAdmin.classList.add('hidden');
                 }
                 
-                // Active trigger fetch cascades
                 fetchTournaments();
                 fetchWallet();
                 fetchLeaderboard();
@@ -362,7 +355,6 @@
             }
         }
 
-        // Tab Screen Layout Content Selector Controller
         function switchAuthTab(target) {
             const btnLogin = document.getElementById('btn-tab-login');
             const btnSignup = document.getElementById('btn-tab-signup');
@@ -391,7 +383,6 @@
                 btn.className = "px-5 py-2.5 text-sm font-semibold border border-slate-800 text-slate-400 rounded-xl hover:bg-slate-900/50 transition-all whitespace-nowrap";
             });
 
-            // Re-apply targeted admin contextual accent indicators
             const adminNavTab = document.getElementById('tab-admin');
             adminNavTab.className = "px-5 py-2.5 text-sm font-semibold border border-slate-700 bg-amber-500/10 text-amber-400 rounded-xl hover:bg-amber-500/20 transition-all whitespace-nowrap";
 
@@ -405,8 +396,6 @@
                 activeTabButton.className = "tab-btn-active px-5 py-2.5 text-sm font-semibold border border-slate-800 rounded-xl transition-all whitespace-nowrap";
             }
         }
-
-        // ==================== SERVICE EXECUTION ACTIONS HANDLERS ====================
 
         async function handleLogin(e) {
             e.preventDefault();
@@ -460,7 +449,6 @@
             showNotification('Session Terminated', 'Identity credentials detached safely.', 'ℹ️');
         }
 
-        // Dynamic Tournament List Execution Node
         async function fetchTournaments() {
             try {
                 const response = await fetch(`${API_URL}/api/tournaments`);
@@ -495,7 +483,6 @@
                         `;
                     }
 
-                    // 🔐 Room Details UI block template setup (Credentials initially completely masked dynamically via explicit secure function call)
                     let roomDetailsUI = '';
                     if (isJoined || user?.isAdmin) {
                         roomDetailsUI = `
@@ -559,14 +546,12 @@
             }
         }
 
-        // 🔐 FRONTEND SECURITY BRIDGE SECURE FETCH ENGINE MECHANISM
         async function fetchSecureRoomCredentials(tournamentId) {
             const secureBox = document.getElementById(`secure-room-box-${tournamentId}`);
             const idField = document.getElementById(`secure-id-field-${tournamentId}`);
             const passField = document.getElementById(`secure-pass-field-${tournamentId}`);
 
             try {
-                // Secure specialized isolation route call architecture passing validation header parameters
                 const response = await authFetch(`${API_URL}/api/tournaments/${tournamentId}/room`);
                 const data = await response.json();
 
@@ -613,7 +598,6 @@
             }
         }
 
-        // Wallet Balance Interface Updates Processing Unit Loop
         async function fetchWallet() {
             if (!getCurrentUser()) return;
             try {
@@ -705,8 +689,6 @@
                 console.error("Leaderboard interface construction matrix error stream", err);
             }
         }
-
-        // ==================== ADMINISTRATIVE OPERATION CONTROL MATRIX ====================
 
         function fetchAdminPanelData() {
             if (!getCurrentUser()?.isAdmin) return;
@@ -969,12 +951,10 @@
             }
         }
 
-        // Initialize runtime sequence validation
         window.onload = function() {
             evaluateAuthViewContextState();
         };
 
-        // Bind utility methods for layout runtime integration context scopes
         window.handleLogin = handleLogin;
         window.handleSignup = handleSignup;
         window.switchAuthTab = switchAuthTab;
