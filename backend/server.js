@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({ origin: true }));
 app.use(express.json());
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://kushalsaini0007_db:kush%40123x@cluster0.9fztkn9.mongodb.net/nexmill_arena?retryWrites=true&w=majority&appName=Cluster0';
+const MONGODB_URI = process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb+srv://kushalsaini0007_db:kush5547x@cluster0.9fztkn9.mongodb.net/nexmill_arena?retryWrites=true&w=majority&appName=Cluster0';
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('✅ MongoDB connected (Atlas)'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
