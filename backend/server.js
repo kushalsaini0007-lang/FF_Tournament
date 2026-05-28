@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -9,8 +10,14 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({ origin: true }));
 app.use(express.json());
 
-const MONGODB_URI = process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb+srv://kushalsaini0007_db:kush5547x@cluster0.9fztkn9.mongodb.net/nexmill_arena?retryWrites=true&w=majority&appName=Cluster0';
-mongoose.connect(MONGODB_URI)
+const MONGODB_URI = process.env.MONGO_URI || 'mongodb+srv://kushalsaini0007_db:kush5547x@cluster0.9fztkn9.mongodb.net/nexmill_arena?retryWrites=true&w=majority&appName=Cluster0';
+
+// ✅ FIXED: Added connection options for DNS resolution
+mongoose.connect(MONGODB_URI, {
+  serverSelectionTimeoutMS: 30000,
+  socketTimeoutMS: 45000,
+  family: 4 // Force IPv4
+})
   .then(() => console.log('✅ MongoDB connected (Atlas)'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
@@ -42,8 +49,8 @@ const tournamentSchema = new mongoose.Schema({
   rules: { type: String, default: 'Standard Rules Apply' },
   adminProfit: { type: Number, default: 0 },
   participants: [participantSchema],
-  roomID: { type: String, default: "" },   
-  roomPass: { type: String, default: "" }, 
+  roomID: { type: String, default: "" },
+  roomPass: { type: String, default: "" },
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -684,7 +691,8 @@ app.post('/api/admin/distribute-prizes', async (req, res) => {
     console.error(err);
     res.status(500).json({ message: 'Error distributing prizes' });
   }
-}); // Admin panel se Room ID aur Password update karne ke liye naya rasta
+});
+
 app.put('/api/tournaments/:id/room-info', async (req, res) => {
   try {
     const { roomID, roomPass } = req.body;
@@ -734,6 +742,6 @@ async function seedAdminUser() {
 
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
-  await //seedInitialTournaments();
+  await seedInitialTournaments();
   await seedAdminUser();
 });
