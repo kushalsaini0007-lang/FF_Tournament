@@ -7,7 +7,7 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const FRONTEND_DIR = path.join(__dirname, '..', 'frontend');
+const FRONTEND_DIR = path.join(__dirname, 'frontend');
 
 app.use(cors({ origin: true }));
 app.use(express.json());
