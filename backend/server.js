@@ -10,7 +10,18 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({ origin: true }));
 app.use(express.json());
 
-const MONGODB_URI = process.env.MONGO_URI || 'mongodb+srv://kushalsaini0007_db:kush5547x@cluster0.9fztkn9.mongodb.net/nexmill_arena?retryWrites=true&w=majority&appName=Cluster0';
+const MONGODB_URI = process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb+srv://kushalsaini0007_db:kush5547x@cluster0.9fztkn9.mongodb.net/nexmill_arena?retryWrites=true&w=majority&appName=Cluster0';
+
+// DEBUG LOGS TO CATCH THE ERROR
+if (process.env.MONGO_URI) {
+    console.log("🔍 DEBUG: Server is using 'process.env.MONGO_URI' from Render Dashboard!");
+} else if (process.env.MONGODB_URI) {
+    console.log("🔍 DEBUG: Server is using 'process.env.MONGODB_URI' from Render Dashboard!");
+} else {
+    console.log("🔍 DEBUG: Server is ignoring environment variables and using the HARDCODED fallback string!");
+}
+
+console.log("🔍 DEBUG: The current database user is:", MONGODB_URI.split('://')[1]?.split(':')[0]);
 
 // ✅ FIXED: Added connection options for DNS resolution
 mongoose.connect(MONGODB_URI, {

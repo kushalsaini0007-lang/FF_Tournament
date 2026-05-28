@@ -1313,6 +1313,11 @@ const roomInfoHTML = hasJoined && t.roomID && t.roomPass
         showNotification('Error', 'Unexpected network error occurred.', '❌');
     }
         }
+
+        // Expose auth handlers for inline onclick usage
+        window.handleLogin = handleLogin;
+        window.handleSignup = handleSignup;
+        window.switchAuthTab = switchAuthTab;
     </script>
 </body>
 </html>
