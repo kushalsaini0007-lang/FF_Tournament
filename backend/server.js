@@ -267,7 +267,8 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.get('/api/tournaments', async (req, res) => {
   try {
-    const tournaments = await Tournament.find().sort({ createdAt: -1 });
+    // ✅ SECURITY FIX: Room ID aur Password ko normal global list se bilkul chhipa diya hai
+    const tournaments = await Tournament.find().select('-roomID -roomPass').sort({ createdAt: -1 });
     res.json(tournaments);
   } catch (err) {
     res.status(500).json({ message: 'Server error fetching tournaments' });
@@ -704,21 +705,81 @@ app.post('/api/admin/distribute-prizes', async (req, res) => {
   }
 });
 
-app.put('/api/tournaments/:id/room-info', async (req, res) => {
+// ==================== SECURE ROOM ID & PASSWORD SYSTEM (WITH CCTV LOGS) ====================
+
+// 🅰️ ADMIN ROUTE: Isse admin custom room ki details save karega
+app.post('/api/admin/tournaments/:id/room', async (req, res) => {
+  console.log(`\n🚨 [CCTV LOG - ADMIN] Room update request received for Match ID: ${req.params.id}`);
   try {
+    const adminUser = await requireAdmin(req, res);
+    if (!adminUser) {
+      console.log("❌ [CCTV LOG - ADMIN] Blocked: Request is NOT from an Admin.");
+      return; 
+    }
+    console.log(`✅ [CCTV LOG - ADMIN] Access Granted for Admin: ${adminUser.email}`);
+
     const { roomID, roomPass } = req.body;
-    const matchId = req.params.id;
+    console.log(`🔍 [CCTV LOG - ADMIN] Data received -> ID: ${roomID || 'EMPTY'}, Pass: ${roomPass || 'EMPTY'}`);
+
+    if (!roomID || !roomPass) {
+      console.log("❌ [CCTV LOG - ADMIN] Failed: Missing Room ID or Password input.");
+      return res.status(400).json({ message: 'Both Room ID and Password are required.' });
+    }
 
     const updated = await Tournament.findByIdAndUpdate(
-      matchId,
+      req.params.id,
       { roomID, roomPass },
       { new: true }
     );
 
+    if (!updated) {
+      console.log("❌ [CCTV LOG - ADMIN] Error: Tournament match not found in Database.");
+      return res.status(404).json({ message: 'Tournament not found.' });
+    }
+
+    console.log("✅ [CCTV LOG - ADMIN] Success: Room Details successfully pushed to Database!");
     res.json({ message: 'Room ID & Password updated successfully!', updated });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error while updating room info' });
+    console.error("💥 [CCTV LOG - ADMIN] CRITICAL SERVER ERROR:", err);
+    res.status(500).json({ message: 'Server error while updating room info', error: err.message });
+  }
+});
+
+// 🅱️ USER ROUTE: Sirf joined players ko ID/PASS dikhane ke liye secure gate
+app.get('/api/tournaments/:id/room', async (req, res) => {
+  console.log(`\n🔒 [CCTV LOG - USER] Security check triggered for Match ID: ${req.params.id}`);
+  try {
+    const user = await requireUser(req, res);
+    if (!user) {
+      console.log("❌ [CCTV LOG - USER] Blocked: Visitor is not logged in.");
+      return; 
+    }
+    console.log(`👋 [CCTV LOG - USER] Identity Verified: ${user.name} (ID: ${user._id})`);
+
+    const tournament = await Tournament.findById(req.params.id);
+    if (!tournament) {
+      console.log("❌ [CCTV LOG - USER] Error: Tournament match not found.");
+      return res.status(404).json({ message: 'Tournament not found.' });
+    }
+
+    const hasJoined = tournament.participants.some(p => p.userId && p.userId.toString() === user._id.toString());
+    console.log(`🔍 [CCTV LOG - USER] Scan Report -> Joined Status: ${hasJoined} | Admin Status: ${user.isAdmin}`);
+
+    if (!hasJoined && !user.isAdmin) {
+      console.log(`❌ [CCTV LOG - USER] ALERT: ${user.name} tried to view Room Codes without registering! ACCESS DENIED.`);
+      return res.status(403).json({ message: 'Access Denied! You have not registered for this tournament.' });
+    }
+
+    console.log(`✅ [CCTV LOG - USER] Access Granted! Sending room data securely to ${user.name}.`);
+    res.json({
+      roomID: tournament.roomID || "Not Assigned Yet",
+      roomPass: tournament.roomPass || "Not Assigned Yet"
+    });
+
+  } catch (err) {
+    console.error("💥 [CCTV LOG - USER] CRITICAL SERVER ERROR:", err);
+    res.status(500).json({ message: 'Server error while fetching room details', error: err.message });
   }
 });
 
