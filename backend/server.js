@@ -715,6 +715,6 @@ async function seedAdminUser() {
 
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
-  await seedInitialTournaments();
+  await //seedInitialTournaments();
   await seedAdminUser();
 });
