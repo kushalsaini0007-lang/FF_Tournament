@@ -179,15 +179,6 @@ function calculateAdminProfit(entryFeeStr, totalSlots) {
   return Math.floor(numericEntry * totalSlots * 0.20);
 }
 
-async function creditWalletByGameUid(gameUid, amount) {
-  const user = await User.findOne({ gameUid });
-  if (!user) return null;
-  const wallet = await getOrCreateWallet(user._id);
-  wallet.balance += amount;
-  await wallet.save();
-  return wallet;
-}
-
 // ==================== AUTH ROUTES ====================
 
 app.post('/api/auth/signup', async (req, res) => {
@@ -209,7 +200,8 @@ app.post('/api/auth/signup', async (req, res) => {
       return res.status(409).json({ message: 'An account with this email already exists.' });
     }
 
-    const isAdmin = trimmedEmail === 'admin@nexmillarena.com';
+    // ✅ NEW ADMIN EMAIL CHECK
+    const isAdmin = trimmedEmail === 'adminkush@nexmillarena.com';
     const hashedPassword = await bcrypt.hash(trimmedPassword, 10);
     const user = await User.create({
       name: trimmedName,
@@ -267,7 +259,7 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.get('/api/tournaments', async (req, res) => {
   try {
-    // ✅ SECURITY FIX: Room ID aur Password ko normal global list se bilkul chhipa diya hai
+    // 🔐 SECURITY: Public list se room details secure rakhi hain
     const tournaments = await Tournament.find().select('-roomID -roomPass').sort({ createdAt: -1 });
     res.json(tournaments);
   } catch (err) {
@@ -275,11 +267,35 @@ app.get('/api/tournaments', async (req, res) => {
   }
 });
 
+app.get('/api/tournaments/:id/room', async (req, res) => {
+  try {
+    const user = await requireUser(req, res);
+    if (!user) return;
+
+    const tournament = await Tournament.findById(req.params.id);
+    if (!tournament) return res.status(404).json({ message: 'Match not found.' });
+
+    const isParticipant = tournament.participants.some(p => p.userId && p.userId.toString() === user._id.toString());
+
+    if (user.isAdmin || isParticipant) {
+      res.json({
+        roomID: tournament.roomID || "",
+        roomPass: tournament.roomPass || ""
+      });
+    } else {
+      res.status(403).json({ message: 'Access denied. Please join this match to view room credentials.' });
+    }
+  } catch (err) {
+    console.error("❌ Room info access error:", err);
+    res.status(500).json({ message: 'Server error while fetching room details.' });
+  }
+});
+
 app.post('/api/tournaments', async (req, res) => {
   try {
     if (!(await requireAdmin(req, res))) return;
     const { matchTitle, mapName, entryFee, prizePool, totalSlots, rules } = req.body;
-    if (!matchTitle || !mapName || !entryFee || !prizePool || !totalSlots) {
+    if (!matchTitle || !mapName || !entryFee || !prizePool || totalSlots === undefined) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
     const adminProfit = calculateAdminProfit(entryFee, totalSlots);
@@ -705,81 +721,23 @@ app.post('/api/admin/distribute-prizes', async (req, res) => {
   }
 });
 
-// ==================== SECURE ROOM ID & PASSWORD SYSTEM (WITH CCTV LOGS) ====================
-
-// 🅰️ ADMIN ROUTE: Isse admin custom room ki details save karega
-app.post('/api/admin/tournaments/:id/room', async (req, res) => {
-  console.log(`\n🚨 [CCTV LOG - ADMIN] Room update request received for Match ID: ${req.params.id}`);
+app.put('/api/tournaments/:id/room-info', async (req, res) => {
   try {
-    const adminUser = await requireAdmin(req, res);
-    if (!adminUser) {
-      console.log("❌ [CCTV LOG - ADMIN] Blocked: Request is NOT from an Admin.");
-      return; 
-    }
-    console.log(`✅ [CCTV LOG - ADMIN] Access Granted for Admin: ${adminUser.email}`);
+    if (!(await requireAdmin(req, res))) return;
 
     const { roomID, roomPass } = req.body;
-    console.log(`🔍 [CCTV LOG - ADMIN] Data received -> ID: ${roomID || 'EMPTY'}, Pass: ${roomPass || 'EMPTY'}`);
-
-    if (!roomID || !roomPass) {
-      console.log("❌ [CCTV LOG - ADMIN] Failed: Missing Room ID or Password input.");
-      return res.status(400).json({ message: 'Both Room ID and Password are required.' });
-    }
+    const matchId = req.params.id;
 
     const updated = await Tournament.findByIdAndUpdate(
-      req.params.id,
+      matchId,
       { roomID, roomPass },
       { new: true }
     );
 
-    if (!updated) {
-      console.log("❌ [CCTV LOG - ADMIN] Error: Tournament match not found in Database.");
-      return res.status(404).json({ message: 'Tournament not found.' });
-    }
-
-    console.log("✅ [CCTV LOG - ADMIN] Success: Room Details successfully pushed to Database!");
     res.json({ message: 'Room ID & Password updated successfully!', updated });
-
   } catch (err) {
-    console.error("💥 [CCTV LOG - ADMIN] CRITICAL SERVER ERROR:", err);
-    res.status(500).json({ message: 'Server error while updating room info', error: err.message });
-  }
-});
-
-// 🅱️ USER ROUTE: Sirf joined players ko ID/PASS dikhane ke liye secure gate
-app.get('/api/tournaments/:id/room', async (req, res) => {
-  console.log(`\n🔒 [CCTV LOG - USER] Security check triggered for Match ID: ${req.params.id}`);
-  try {
-    const user = await requireUser(req, res);
-    if (!user) {
-      console.log("❌ [CCTV LOG - USER] Blocked: Visitor is not logged in.");
-      return; 
-    }
-    console.log(`👋 [CCTV LOG - USER] Identity Verified: ${user.name} (ID: ${user._id})`);
-
-    const tournament = await Tournament.findById(req.params.id);
-    if (!tournament) {
-      console.log("❌ [CCTV LOG - USER] Error: Tournament match not found.");
-      return res.status(404).json({ message: 'Tournament not found.' });
-    }
-
-    const hasJoined = tournament.participants.some(p => p.userId && p.userId.toString() === user._id.toString());
-    console.log(`🔍 [CCTV LOG - USER] Scan Report -> Joined Status: ${hasJoined} | Admin Status: ${user.isAdmin}`);
-
-    if (!hasJoined && !user.isAdmin) {
-      console.log(`❌ [CCTV LOG - USER] ALERT: ${user.name} tried to view Room Codes without registering! ACCESS DENIED.`);
-      return res.status(403).json({ message: 'Access Denied! You have not registered for this tournament.' });
-    }
-
-    console.log(`✅ [CCTV LOG - USER] Access Granted! Sending room data securely to ${user.name}.`);
-    res.json({
-      roomID: tournament.roomID || "Not Assigned Yet",
-      roomPass: tournament.roomPass || "Not Assigned Yet"
-    });
-
-  } catch (err) {
-    console.error("💥 [CCTV LOG - USER] CRITICAL SERVER ERROR:", err);
-    res.status(500).json({ message: 'Server error while fetching room details', error: err.message });
+    console.error(err);
+    res.status(500).json({ message: 'Server error while updating room info' });
   }
 });
 
@@ -797,10 +755,11 @@ async function seedInitialTournaments() {
 }
 
 async function seedAdminUser() {
-  const adminEmail = 'admin@nexmillarena.com';
+  // 🔐 UPDATED: Admin credentials changed
+  const adminEmail = 'adminkush@nexmillarena.com';
   let admin = await User.findOne({ email: adminEmail });
   if (!admin) {
-    const hashedPassword = await bcrypt.hash('admin123', 10);
+    const hashedPassword = await bcrypt.hash('admin123kush', 10);
     admin = await User.create({
       name: 'NexmilL Admin',
       email: adminEmail,
@@ -808,7 +767,7 @@ async function seedAdminUser() {
       isAdmin: true
     });
     await Wallet.create({ userId: admin._id, balance: 0 });
-    console.log('✅ Admin user seeded (admin@nexmillarena.com / admin123)');
+    console.log('✅ Admin user seeded (adminkush@nexmillarena.com / admin123kush)');
   }
 }
 
