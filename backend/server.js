@@ -4,24 +4,26 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const FRONTEND_DIR = path.join(__dirname, 'frontend');
+const FRONTEND_DIR = fs.existsSync(path.join(__dirname, '..', 'frontend'))
+  ? path.join(__dirname, '..', 'frontend')
+  : path.join(__dirname, 'frontend');
 
-app.use(cors({ origin: true }));
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
-app.use(express.static(FRONTEND_DIR));
 
-const MONGODB_URI = process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb+srv://kushalsaini0007_db:kush5547x@cluster0.9fztkn9.mongodb.net/nexmill_arena?retryWrites=true&w=majority&appName=Cluster0';
+const MONGODB_URI = process.env.MONGO_URI || 'mongodb+srv://kushalsaini0007_db:kush5547x@cluster0.9fztkn9.mongodb.net/nexmill_arena?retryWrites=true&w=majority&appName=Cluster0';
 
 mongoose.connect(MONGODB_URI, {
   serverSelectionTimeoutMS: 30000,
   socketTimeoutMS: 45000,
   family: 4
 })
-  .then(() => console.log('MongoDB connected (Atlas)'))
-  .catch(err => console.error('MongoDB connection error:', err));
+.then(() => console.log('✅ MongoDB connected'))
+.catch(err => console.error('❌ MongoDB error:', err));
 
 // ==================== SCHEMAS ====================
 const userSchema = new mongoose.Schema({
@@ -220,28 +222,20 @@ app.get('/api/tournaments', async (req, res) => {
   }
 });
 
-// 🔐 SECURE ROOM CREDENTIALS ENDPOINT (only for joined participants or admin)
 app.get('/api/tournaments/:id/room', async (req, res) => {
   try {
     const user = await requireUser(req, res);
     if (!user) return;
-
     const tournament = await Tournament.findById(req.params.id);
     if (!tournament) return res.status(404).json({ message: 'Tournament not found.' });
-
     const isJoined = isParticipant(tournament, user._id);
     const isAdmin = user.isAdmin === true;
-
     if (!isJoined && !isAdmin) {
       return res.status(403).json({ message: 'Access Denied: You must join this tournament to view Room Credentials.' });
     }
-
-    res.json({
-      roomID: tournament.roomID || '',
-      roomPass: tournament.roomPass || ''
-    });
+    res.json({ roomID: tournament.roomID || '', roomPass: tournament.roomPass || '' });
   } catch (err) {
-    console.error('Room info error:', err);
+    console.error(err);
     res.status(500).json({ message: 'Server error while fetching room details.' });
   }
 });
@@ -263,12 +257,15 @@ app.post('/api/tournaments', async (req, res) => {
   }
 });
 
+// ✅ DELETE TOURNAMENT ROUTE (only admin)
 app.delete('/api/tournaments/:id', async (req, res) => {
   try {
     if (!(await requireAdmin(req, res))) return;
-    await Tournament.findByIdAndDelete(req.params.id);
+    const tournament = await Tournament.findByIdAndDelete(req.params.id);
+    if (!tournament) return res.status(404).json({ message: 'Tournament not found.' });
     res.json({ message: 'Tournament deleted successfully.' });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Error deleting tournament.' });
   }
 });
@@ -303,15 +300,10 @@ app.post('/api/tournaments/:id/join', async (req, res) => {
   }
 });
 
-// ✅ ADMIN UPDATE ROOM CREDENTIALS ENDPOINT
 app.put('/api/tournaments/:id/room-info', async (req, res) => {
   try {
     if (!(await requireAdmin(req, res))) return;
-    const updated = await Tournament.findByIdAndUpdate(
-      req.params.id,
-      { roomID: req.body.roomID || '', roomPass: req.body.roomPass || '' },
-      { new: true }
-    );
+    const updated = await Tournament.findByIdAndUpdate(req.params.id, { roomID: req.body.roomID || '', roomPass: req.body.roomPass || '' }, { new: true });
     if (!updated) return res.status(404).json({ message: 'Tournament not found.' });
     res.json({ message: 'Room ID and password updated successfully!', updated });
   } catch (err) {
@@ -406,10 +398,10 @@ app.get('/api/admin/participants', async (req, res) => {
     if (!(await requireAdmin(req, res))) return;
     const tournaments = await Tournament.find().sort({ createdAt: -1 });
     const list = [];
-    tournaments.forEach(tournament => {
-      if (tournament.participants && tournament.participants.length) {
-        tournament.participants.forEach(player => {
-          list.push({ matchTitle: tournament.matchTitle, ign: player.ign, uid: player.uid, registeredAt: player.registeredAt });
+    tournaments.forEach(t => {
+      if (t.participants && t.participants.length) {
+        t.participants.forEach(p => {
+          list.push({ matchTitle: t.matchTitle, ign: p.ign, uid: p.uid, registeredAt: p.registeredAt });
         });
       }
     });
@@ -434,19 +426,19 @@ app.post('/api/admin/deposits/action', async (req, res) => {
   try {
     if (!(await requireAdmin(req, res))) return;
     const { requestId, action } = req.body;
-    const depositReq = await DepositRequest.findById(requestId);
-    if (!depositReq) return res.status(404).json({ message: 'Deposit request not found.' });
-    if (depositReq.status !== 'pending') return res.status(400).json({ message: 'This request has already been processed.' });
+    const deposit = await DepositRequest.findById(requestId);
+    if (!deposit) return res.status(404).json({ message: 'Deposit request not found.' });
+    if (deposit.status !== 'pending') return res.status(400).json({ message: 'This request has already been processed.' });
     if (action === 'completed') {
-      depositReq.status = 'completed';
-      await depositReq.save();
-      const wallet = await getOrCreateWallet(depositReq.userId);
-      wallet.balance += parseFloat(depositReq.amount);
+      deposit.status = 'completed';
+      await deposit.save();
+      const wallet = await getOrCreateWallet(deposit.userId);
+      wallet.balance += parseFloat(deposit.amount);
       await wallet.save();
       return res.json({ message: 'Deposit approved.', status: 'completed', balance: wallet.balance });
     } else if (action === 'failed') {
-      depositReq.status = 'failed';
-      await depositReq.save();
+      deposit.status = 'failed';
+      await deposit.save();
       return res.json({ message: 'Deposit rejected.', status: 'failed' });
     } else {
       return res.status(400).json({ message: 'Invalid action type.' });
@@ -502,22 +494,22 @@ app.post('/api/admin/distribute-prizes', async (req, res) => {
     if (!tournament) return res.status(404).json({ message: 'Tournament not found.' });
     let totalDistributed = 0;
     for (const w of winners) {
-      const trimmedUid = (w.uid || '').trim();
-      const trimmedIgn = (w.ign || '').trim();
+      const uid = (w.uid || '').trim();
+      const ign = (w.ign || '').trim();
       const rank = parseInt(w.rank, 10);
       const prizeAmount = parseFloat(w.prizeAmount);
-      if (!trimmedUid || !trimmedIgn || !rank || isNaN(prizeAmount) || prizeAmount <= 0) {
+      if (!uid || !ign || !rank || isNaN(prizeAmount) || prizeAmount <= 0) {
         return res.status(400).json({ message: 'Each winner needs uid, ign, rank, and prizeAmount.' });
       }
       let targetUserId = null;
       for (const p of tournament.participants) {
-        if (p.uid === trimmedUid && p.userId) {
+        if (p.uid === uid && p.userId) {
           targetUserId = p.userId;
           break;
         }
       }
       if (!targetUserId) {
-        const linkedUser = await User.findOne({ gameUid: trimmedUid });
+        const linkedUser = await User.findOne({ gameUid: uid });
         if (linkedUser) targetUserId = linkedUser._id;
       }
       if (targetUserId) {
@@ -526,8 +518,8 @@ app.post('/api/admin/distribute-prizes', async (req, res) => {
         await wlt.save();
       }
       totalDistributed += prizeAmount;
-      await Leaderboard.create({ tournamentId: tournament._id, matchTitle: tournament.matchTitle, userId: targetUserId, uid: trimmedUid, ign: trimmedIgn, rank, prizeAmount });
-      await Winner.create({ tournament: tournament.matchTitle, name: trimmedIgn, uid: trimmedUid, prize: 'Rs ' + prizeAmount });
+      await Leaderboard.create({ tournamentId: tournament._id, matchTitle: tournament.matchTitle, userId: targetUserId, uid, ign, rank, prizeAmount });
+      await Winner.create({ tournament: tournament.matchTitle, name: ign, uid, prize: 'Rs ' + prizeAmount });
     }
     res.json({ message: 'Prizes distributed for ' + tournament.matchTitle + '.', totalDistributed });
   } catch (err) {
@@ -539,12 +531,13 @@ app.post('/api/admin/distribute-prizes', async (req, res) => {
 // ==================== SEED ====================
 async function seedAdminUser() {
   const adminEmail = 'adminkush@nexmillarena.com';
+  const adminPassword = 'admin123kush';
   let admin = await User.findOne({ email: adminEmail });
   if (!admin) {
-    const hashedPassword = await bcrypt.hash('admin123kush', 10);
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
     admin = await User.create({ name: 'NexmilL Admin', email: adminEmail, password: hashedPassword, isAdmin: true });
     await Wallet.create({ userId: admin._id, balance: 0 });
-    console.log('Admin user seeded: adminkush@nexmillarena.com / admin123kush');
+    console.log('Admin user seeded:', adminEmail);
   } else {
     admin.isAdmin = true;
     await admin.save();
@@ -562,16 +555,22 @@ async function seedInitialTournaments() {
   }
 }
 
-// SPA fallback
-app.use((req, res, next) => {
+// Static frontend (after API routes so /api/* is never shadowed)
+app.use(express.static(FRONTEND_DIR, { index: false }));
+
+// SPA fallback — non-API GET requests serve index.html
+app.use(function (req, res, next) {
+  if (req.method !== 'GET') return next();
   if (req.path.indexOf('/api') === 0) {
     return res.status(404).json({ message: 'API route not found.' });
   }
-  res.sendFile(path.join(FRONTEND_DIR, 'index.html'));
+  res.sendFile(path.join(FRONTEND_DIR, 'index.html'), function (err) {
+    if (err) next(err);
+  });
 });
 
 app.listen(PORT, async () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
   await seedInitialTournaments();
   await seedAdminUser();
 });
