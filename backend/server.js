@@ -49,6 +49,8 @@ const tournamentSchema = new mongoose.Schema({
   prizePool: { type: String, required: true },
   totalSlots: { type: Number, required: true, min: 1 },
   filledSlots: { type: Number, default: 0 },
+  // Admin visibility control: if false, hidden from regular users until published by admin.
+  isPublished: { type: Boolean, default: true },
   rules: { type: String, default: 'Standard Rules Apply' },
   adminProfit: { type: Number, default: 0 },
   participants: [participantSchema],
@@ -215,7 +217,12 @@ app.post('/api/auth/login', async (req, res) => {
 // ==================== TOURNAMENTS ====================
 app.get('/api/tournaments', async (req, res) => {
   try {
-    const tournaments = await Tournament.find().select('-roomID -roomPass').sort({ createdAt: -1 });
+    const includeUnpublished = String(req.query.includeUnpublished || '') === '1' || String(req.query.includeUnpublished || '') === 'true';
+    if (includeUnpublished) {
+      if (!(await requireAdmin(req, res))) return;
+    }
+    const filter = includeUnpublished ? {} : { isPublished: true };
+    const tournaments = await Tournament.find(filter).select('-roomID -roomPass').sort({ createdAt: -1 });
     res.json(tournaments);
   } catch (err) {
     res.status(500).json({ message: 'Server error fetching tournaments' });
@@ -228,6 +235,9 @@ app.get('/api/tournaments/:id/room', async (req, res) => {
     if (!user) return;
     const tournament = await Tournament.findById(req.params.id);
     if (!tournament) return res.status(404).json({ message: 'Tournament not found.' });
+    if (!tournament.isPublished && !user.isAdmin) {
+      return res.status(403).json({ message: 'This match is not published yet.' });
+    }
     const isJoined = isParticipant(tournament, user._id);
     const isAdmin = user.isAdmin === true;
     if (!isJoined && !isAdmin) {
@@ -244,11 +254,12 @@ app.post('/api/tournaments', async (req, res) => {
   try {
     if (!(await requireAdmin(req, res))) return;
     const { matchTitle, mapName, entryFee, prizePool, totalSlots, rules } = req.body;
+    const isPublished = req.body.isPublished === undefined ? true : !!req.body.isPublished;
     if (!matchTitle || !mapName || !entryFee || !prizePool || totalSlots === undefined) {
       return res.status(400).json({ message: 'Missing required fields.' });
     }
     const adminProfit = calculateAdminProfit(entryFee, totalSlots);
-    const tournament = new Tournament({ matchTitle, mapName, entryFee, prizePool, totalSlots, rules, adminProfit, participants: [] });
+    const tournament = new Tournament({ matchTitle, mapName, entryFee, prizePool, totalSlots, rules, adminProfit, participants: [], isPublished });
     await tournament.save();
     res.status(201).json(tournament);
   } catch (err) {
@@ -279,6 +290,7 @@ app.post('/api/tournaments/:id/join', async (req, res) => {
     if (!ign || !uid) return res.status(400).json({ message: 'IGN and UID are required.' });
     const tournament = await Tournament.findById(req.params.id);
     if (!tournament) return res.status(404).json({ message: 'Match not found.' });
+    if (!tournament.isPublished && !user.isAdmin) return res.status(403).json({ message: 'This match is not published yet.' });
     if (tournament.filledSlots >= tournament.totalSlots) return res.status(400).json({ message: 'Match is already full!' });
     if (tournament.participants.some(p => p.uid === uid)) return res.status(400).json({ message: 'This UID is already registered in this match!' });
     const entryFee = parseEntryFee(tournament.entryFee);
@@ -297,6 +309,20 @@ app.post('/api/tournaments/:id/join', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Internal server error during join.' });
+  }
+});
+
+// ✅ Publish / Unpublish tournament (only admin)
+app.put('/api/tournaments/:id/publish', async (req, res) => {
+  try {
+    if (!(await requireAdmin(req, res))) return;
+    const isPublished = !!req.body.isPublished;
+    const updated = await Tournament.findByIdAndUpdate(req.params.id, { isPublished }, { new: true });
+    if (!updated) return res.status(404).json({ message: 'Tournament not found.' });
+    res.json({ message: `Tournament ${isPublished ? 'published' : 'unpublished'} successfully.`, tournament: updated });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error updating publish status.' });
   }
 });
 
