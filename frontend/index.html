@@ -7,6 +7,8 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; frame-src https://www.youtube.com https://www.youtube-nocookie.com; connect-src 'self' http://localhost:5000 http://127.0.0.1:5000 https://api.qrserver.com https:; font-src 'self' https: data:; object-src 'none'; base-uri 'self'; form-action 'self';" />
   <!-- Optional override: set in production if backend is on a different origin -->
   <!-- <meta name="api-base" content="https://your-domain.com"> -->
   <title>Nexmill Arena | Free Fire Tournaments</title>
@@ -117,6 +119,71 @@
       font-size: 1.05rem;
       margin-bottom: .9rem;
     }
+    .admin-table-scroll {
+      max-height: 350px;
+      overflow-y: auto;
+      overflow-x: auto;
+      border: 1px solid rgba(51, 65, 85, 0.65);
+      border-radius: 0.75rem;
+      background: rgba(2, 6, 23, 0.35);
+    }
+    .admin-table-scroll .admin-data-table thead th {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgb(2 6 23);
+      box-shadow: 0 1px 0 rgba(51, 65, 85, 0.85);
+    }
+    .admin-table-scroll::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    .admin-table-scroll::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.55);
+      border-radius: 9999px;
+    }
+    .live-stream-video-wrap {
+      width: 100%;
+      height: 320px;
+      max-width: 100%;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      background: #020617;
+      border: 1px solid rgba(51, 65, 85, 0.85);
+    }
+    .live-stream-video-wrap iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 280px;
+      border: 0;
+    }
+    @media (max-width: 640px) {
+      .live-stream-video-wrap {
+        height: 280px;
+      }
+    }
+    .channel-logo {
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 9999px;
+      object-fit: cover;
+      border: 2px solid rgba(16, 185, 129, 0.45);
+      background: #0f172a;
+    }
+    .notice-banner {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      padding: 0.55rem 0.75rem;
+      border-radius: 0.65rem;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fde68a;
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
     .gradient-outline {
       position: relative;
       border-radius: 1rem;
@@ -134,6 +201,41 @@
       mask-composite: exclude;
       pointer-events: none;
     }
+    @keyframes deposit-qr-glow {
+      0%, 100% {
+        box-shadow:
+          0 25px 50px -12px rgba(16, 185, 129, 0.12),
+          0 0 0 1px rgba(16, 185, 129, 0.14);
+      }
+      50% {
+        box-shadow:
+          0 28px 56px -10px rgba(16, 185, 129, 0.22),
+          0 0 28px rgba(16, 185, 129, 0.16);
+      }
+    }
+    .deposit-qr-card {
+      animation: deposit-qr-glow 2.8s ease-in-out infinite;
+      background: linear-gradient(165deg, #ffffff 0%, #f8fafc 48%, #ffffff 100%);
+    }
+    .deposit-qr-card::after {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border-radius: 1.15rem;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), transparent 42%, rgba(59, 130, 246, 0.04));
+    }
+    .deposit-qr-notch {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .deposit-qr-notch-tl { top: 12px; left: 12px; border-top: 2px solid rgba(16, 185, 129, 0.45); border-left: 2px solid rgba(16, 185, 129, 0.45); border-radius: 6px 0 0 0; }
+    .deposit-qr-notch-tr { top: 12px; right: 12px; border-top: 2px solid rgba(16, 185, 129, 0.45); border-right: 2px solid rgba(16, 185, 129, 0.45); border-radius: 0 6px 0 0; }
+    .deposit-qr-notch-bl { bottom: 12px; left: 12px; border-bottom: 2px solid rgba(16, 185, 129, 0.45); border-left: 2px solid rgba(16, 185, 129, 0.45); border-radius: 0 0 0 6px; }
+    .deposit-qr-notch-br { bottom: 12px; right: 12px; border-bottom: 2px solid rgba(16, 185, 129, 0.45); border-right: 2px solid rgba(16, 185, 129, 0.45); border-radius: 0 0 6px 0; }
   </style>
 </head>
 
@@ -160,9 +262,15 @@
           <p id="apiBadge" class="mt-2 text-[11px] text-slate-400"></p>
         </div>
 
-        <div class="flex p-1 bg-slate-950 rounded-xl mt-5 mb-4">
-          <button id="authTabLogin" class="w-1/2 py-2 rounded-lg auth-tab-active text-sm">Login</button>
-          <button id="authTabSignup" class="w-1/2 py-2 rounded-lg text-slate-300 text-sm">Sign Up</button>
+        <div class="flex p-1 bg-slate-950 rounded-xl mt-5 mb-3">
+          <button type="button" id="authMethodEmail" class="w-1/2 py-2 rounded-lg auth-tab-active text-sm">Email</button>
+          <button type="button" id="authMethodPhone" class="w-1/2 py-2 rounded-lg text-slate-300 text-sm">Phone</button>
+        </div>
+
+        <div id="emailAuthSection">
+        <div class="flex p-1 bg-slate-950 rounded-xl mb-4">
+          <button type="button" id="authTabLogin" class="w-1/2 py-2 rounded-lg auth-tab-active text-sm">Login</button>
+          <button type="button" id="authTabSignup" class="w-1/2 py-2 rounded-lg text-slate-300 text-sm">Sign Up</button>
         </div>
 
         <form id="loginForm" class="space-y-3">
@@ -180,14 +288,40 @@
         <form id="signupForm" class="space-y-3 hidden">
           <input id="signupNameInput" type="text" required placeholder="Full Name"
                  class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm">
-          <input id="signupEmailInput" type="email" required placeholder="Email" autocomplete="email"
+          <input id="signupEmailInput" type="email" placeholder="Email (optional if phone provided)" autocomplete="email"
                  class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm">
-          <input id="signupPasswordInput" type="password" required placeholder="Password (min 6 chars)"
+          <input id="signupPhoneInput" type="tel" placeholder="+91XXXXXXXXXX"
                  class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm">
-          <button id="signupBtn" type="submit" onclick="return window.handleSignup?.(event) ?? true"
-                  class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-xl py-2.5 text-sm">
+          <input id="signupPasswordInput" type="password" required placeholder="Password (min 6 chars, any characters allowed)"
+                 class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm">
+          <input id="signupReferralInput" type="text" placeholder="Referral code (optional)"
+                 class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm uppercase tracking-wider">
+          <p id="signupReferralHint" class="text-[11px] text-emerald-400/90 hidden"></p>
+          <p class="text-[11px] text-slate-400 leading-relaxed">
+            By creating an account, you agree to our fair play policy and terms. Under 18 requires parental consent.
+          </p>
+          <label class="flex items-start gap-2 text-[11px] text-slate-400 cursor-pointer">
+            <input id="signupAgreeCheckbox" type="checkbox" class="mt-0.5 accent-emerald-500">
+            <span>I agree to the terms and fair play policy</span>
+          </label>
+          <button id="signupBtn" type="submit" disabled
+                  onclick="return window.handleSignup?.(event) ?? true"
+                  class="w-full bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-bold rounded-xl py-2.5 text-sm">
             Create Account
           </button>
+        </form>
+        </div>
+
+        <form id="phoneLoginForm" class="hidden space-y-3">
+          <input id="loginPhone" type="tel" placeholder="+91XXXXXXXXXX" autocomplete="tel"
+                 class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm">
+          <input id="phoneLoginPasswordInput" type="password" placeholder="Password (min 6 chars, any characters allowed)" autocomplete="current-password"
+                 class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm">
+          <button id="phoneLoginBtn" type="submit"
+                  class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-xl py-2.5 text-sm">
+            Login with Phone
+          </button>
+          <p class="text-[10px] text-slate-500 text-center">Use Sign Up (Email tab) to register with phone + password.</p>
         </form>
 
         <p id="authError" class="text-rose-400 text-xs text-center mt-3 hidden"></p>
@@ -216,15 +350,18 @@
           <div class="flex items-center gap-3">
             <img src="logo.png" alt="Nexmill logo" class="w-10 h-10 rounded-xl" onerror="this.style.display='none'">
             <div>
-              <p class="text-lg font-black leading-tight">Nexmill <span class="text-emerald-400">Free Fire</span></p>
-              <p class="text-[10px] text-slate-400 uppercase tracking-wider">Tournament Platform</p>
+              <p class="text-lg font-black leading-tight">NeXmiL <span class="text-emerald-400">Tournament</span></p>
+              <p class="text-[10px] text-slate-400 uppercase tracking-wider">Founder : Kushal Saini</p>
             </div>
           </div>
 
           <div class="flex flex-wrap gap-2 items-center">
-            <div class="glass rounded-xl px-3 py-2 flex gap-2 items-center text-xs sm:text-sm">
+            <div class="glass rounded-xl px-3 py-2 flex flex-wrap gap-2 items-center text-xs sm:text-sm">
               <span class="text-slate-400">Wallet</span>
               <span id="walletBalance" class="font-bold text-emerald-400">Rs 0.00</span>
+              <span class="text-slate-600">|</span>
+              <span class="text-slate-400">🪙 Coins</span>
+              <span id="coinsBalance" class="font-bold text-amber-300">0</span>
               <button id="openDepositBtn" class="bg-emerald-500 text-slate-950 rounded-md px-2 py-1 text-[11px] font-semibold">+ Add</button>
               <button id="openWithdrawBtn" class="bg-amber-500 text-slate-950 rounded-md px-2 py-1 text-[11px] font-semibold">- Withdraw</button>
             </div>
@@ -265,23 +402,13 @@
       </section>
 
       <main class="max-w-7xl mx-auto px-3 sm:px-4 py-6">
-        <!-- Hero -->
-        <section class="gradient-outline glass rounded-2xl p-5 mb-6 animate__animated animate__fadeInUp">
-          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div>
-              <p class="text-emerald-400 text-xs uppercase tracking-wider font-semibold">Arena Live</p>
-              <h2 class="text-2xl sm:text-3xl font-black mt-1 leading-tight">Join matches. Unlock room creds. Win real rewards.</h2>
-              <p class="text-slate-300 text-sm mt-2 max-w-2xl">
-                Nexmill Arena connects competitive Free Fire players with fast matchmaking, secure room details, wallet support, and automated prize distribution.
-              </p>
-              <div class="mt-4 flex flex-wrap gap-2">
-                <a href="#live" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 rounded-xl px-4 py-2 text-sm font-bold">View Live Tournaments</a>
-                <button id="quickDepositBtn" class="bg-slate-800/70 hover:bg-slate-700 border border-slate-700 rounded-xl px-4 py-2 text-sm font-semibold">
-                  Add Money
-                </button>
-                <span id="apiStatus" class="text-xs text-slate-400 flex items-center"></span>
-              </div>
-            </div>
+        <!-- Live Stream -->
+        <section id="liveStreamSection" class="gradient-outline glass rounded-2xl p-4 sm:p-5 mb-6 animate__animated animate__fadeInUp">
+          <div id="liveStreamContainer"></div>
+          <div class="mt-3 flex flex-wrap gap-2 items-center">
+            <a href="#live" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 rounded-xl px-4 py-2 text-sm font-bold">View Live Tournaments</a>
+            <button id="quickDepositBtn" type="button" class="bg-slate-800/70 hover:bg-slate-700 border border-slate-700 rounded-xl px-4 py-2 text-sm font-semibold">Add Money</button>
+            <span id="apiStatus" class="text-xs text-slate-400 flex items-center"></span>
           </div>
         </section>
 
@@ -309,6 +436,8 @@
                 </div>
               </div>
 
+              <div id="featuredTournamentMain" class="mb-5"></div>
+
               <div id="tournamentLoading" class="hidden text-center py-8">
                 <span class="spinner"></span><span class="text-sm text-slate-300">Loading tournaments...</span>
               </div>
@@ -323,9 +452,64 @@
             <!-- Admin panel -->
             <section id="adminPanel" class="hidden mt-8 space-y-6">
               <div class="glass rounded-2xl p-4 sm:p-5">
+                <h3 class="text-rose-300 font-bold mb-3">📺 Live Stream Settings</h3>
+                <p class="text-xs text-slate-400 mb-3">Configure the YouTube live stream shown at the top of the dashboard.</p>
+                <label class="inline-flex items-center gap-2 text-xs text-slate-300 mb-3">
+                  <input id="liveStreamShowInput" type="checkbox" class="accent-emerald-500">
+                  Show on dashboard
+                </label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <input id="liveStreamYoutubeInput" type="text" placeholder="YouTube URL (watch, youtu.be, live, shorts, embed)" class="md:col-span-2 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm">
+                  <input id="liveStreamTitleInput" type="text" placeholder="Stream title / match name" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm">
+                  <input id="liveStreamScheduleInput" type="text" placeholder="Schedule (e.g. Starts at 8:30 PM IST)" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm">
+                  <textarea id="liveStreamDescInput" rows="2" placeholder="Short description (optional)" class="md:col-span-2 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm"></textarea>
+                </div>
+                <div class="mt-3 flex flex-col sm:flex-row gap-3 items-start">
+                  <div>
+                    <label class="text-xs text-slate-400 block mb-1">Channel logo / screenshot</label>
+                    <input id="liveStreamLogoFile" type="file" accept="image/*" class="text-xs text-slate-300">
+                  </div>
+                  <img id="liveStreamLogoPreview" alt="Logo preview" class="channel-logo hidden">
+                </div>
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <button type="button" id="saveLiveStreamBtn" class="bg-rose-600 hover:bg-rose-500 text-white rounded-xl px-4 py-2 text-sm font-bold">Save Live Stream</button>
+                  <button type="button" id="deleteLiveStreamBtn" class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 rounded-xl px-4 py-2 text-sm font-semibold">Delete Live Stream</button>
+                </div>
+              </div>
+
+              <div class="glass rounded-2xl p-4 sm:p-5">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                  <h3 class="text-cyan-400 font-bold">🔔 Transaction Notifications</h3>
+                  <div class="flex flex-wrap gap-2">
+                    <button type="button" id="refreshAdminNotificationsBtn" class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 rounded-lg px-3 py-1.5 text-xs font-semibold">Refresh</button>
+                    <button type="button" id="clearAdminNotificationsBtn" class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 rounded-lg px-3 py-1.5 text-xs font-semibold">Clear all</button>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-400 mb-3">Deposits and withdrawals with wallet balance after each transaction. Auto-refreshes every 15s.</p>
+                <div class="admin-table-scroll">
+                  <table class="admin-data-table w-full text-xs sm:text-sm">
+                    <thead class="bg-slate-950 text-slate-400">
+                      <tr>
+                        <th class="p-2 text-left">User / UID</th>
+                        <th class="p-2 text-left">Type</th>
+                        <th class="p-2 text-left">Amount</th>
+                        <th class="p-2 text-left">Balance</th>
+                        <th class="p-2 text-left">Status</th>
+                        <th class="p-2 text-left">Time</th>
+                        <th class="p-2 text-left">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="adminNotificationsTable">
+                      <tr><td colspan="7" class="p-3 text-slate-500">Open admin panel to load notifications.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="glass rounded-2xl p-4 sm:p-5">
                 <h3 class="text-emerald-400 font-bold mb-3">Deposit Requests</h3>
-                <div class="overflow-x-auto">
-                  <table class="w-full text-xs sm:text-sm">
+                <div class="admin-table-scroll">
+                  <table class="admin-data-table w-full text-xs sm:text-sm">
                     <thead class="bg-slate-950 text-slate-400">
                       <tr>
                         <th class="p-2 text-left">UID</th>
@@ -342,8 +526,8 @@
 
               <div class="glass rounded-2xl p-4 sm:p-5">
                 <h3 class="text-amber-400 font-bold mb-3">Withdrawal Requests</h3>
-                <div class="overflow-x-auto">
-                  <table class="w-full text-xs sm:text-sm">
+                <div class="admin-table-scroll">
+                  <table class="admin-data-table w-full text-xs sm:text-sm">
                     <thead class="bg-slate-950 text-slate-400">
                       <tr>
                         <th class="p-2 text-left">UID</th>
@@ -359,9 +543,37 @@
               </div>
 
               <div class="glass rounded-2xl p-4 sm:p-5">
+                <h3 class="text-fuchsia-400 font-bold mb-3">Referral Coin Settings</h3>
+                <p class="text-xs text-slate-400 mb-2">Change reward and coin value anytime (saved for all users).</p>
+                <div class="grid grid-cols-2 gap-2">
+                  <input id="adminReferralCoins" type="number" min="1" placeholder="Coins per referral" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm">
+                  <input id="adminCoinRate" type="number" min="0.01" step="0.01" placeholder="₹ per coin" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm">
+                </div>
+                <button type="button" id="saveReferralSettingsBtn" class="mt-2 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-xl px-4 py-2 text-sm font-bold">Save Referral Settings</button>
+              </div>
+
+              <div class="glass rounded-2xl p-4 sm:p-5">
+                <h3 class="text-violet-400 font-bold mb-3">Referral Leaderboard</h3>
+                <div class="admin-table-scroll">
+                  <table class="admin-data-table w-full text-xs sm:text-sm">
+                    <thead class="bg-slate-950 text-slate-400">
+                      <tr>
+                        <th class="p-2 text-left">#</th>
+                        <th class="p-2 text-left">Name</th>
+                        <th class="p-2 text-left">Code</th>
+                        <th class="p-2 text-left">Referrals</th>
+                        <th class="p-2 text-left">Coins</th>
+                      </tr>
+                    </thead>
+                    <tbody id="adminReferralTable"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="glass rounded-2xl p-4 sm:p-5">
                 <h3 class="text-blue-400 font-bold mb-3">Registered Players</h3>
-                <div class="overflow-x-auto">
-                  <table class="w-full text-xs sm:text-sm">
+                <div class="admin-table-scroll">
+                  <table class="admin-data-table w-full text-xs sm:text-sm">
                     <thead class="bg-slate-950 text-slate-400">
                       <tr>
                         <th class="p-2 text-left">Match</th>
@@ -385,12 +597,66 @@
                   <input id="prizePool" type="text" placeholder="Prize Pool" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm">
                   <input id="totalSlots" type="number" min="1" placeholder="Slots" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm">
                 </div>
+                <input id="tournamentNotice" type="text" placeholder="Notice (e.g. Starts at 6:30 PM IST)" class="w-full mt-2 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm">
                 <textarea id="rules" rows="2" placeholder="Rules" class="w-full mt-2 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm"></textarea>
                 <label class="mt-2 inline-flex items-center gap-2 text-xs text-slate-300">
                   <input id="publishNow" type="checkbox" class="accent-emerald-500" checked>
                   Publish now (if unchecked, tournament stays hidden until you publish it)
                 </label>
                 <button id="createTournamentBtn" class="mt-3 bg-emerald-500 text-slate-950 rounded-xl px-4 py-2 text-sm font-bold">Create Tournament</button>
+              </div>
+
+              <div class="glass rounded-2xl p-4 sm:p-5">
+                <h3 class="text-violet-300 font-bold mb-3">Edit Tournament</h3>
+                <p class="text-xs text-slate-400 mb-3">Select a tournament to edit its details (includes unpublished matches).</p>
+                <select id="editTournamentSelect" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm mb-3">
+                  <option value="">Select tournament to edit</option>
+                </select>
+                <div id="editTournamentForm" class="hidden space-y-2">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-2">
+                    <input id="editMatchTitle" type="text" placeholder="Title" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm">
+                    <select id="editMatchMap" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm">
+                      <option>Bermuda</option><option>Kalahari</option><option>Purgatory</option><option>Alpine</option>
+                    </select>
+                    <input id="editEntryFee" type="text" placeholder="Entry (Rs 20 / Free)" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm">
+                    <input id="editPrizePool" type="text" placeholder="Prize Pool" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm">
+                    <input id="editTotalSlots" type="number" min="1" placeholder="Slots" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm">
+                  </div>
+                  <input id="editTournamentNotice" type="text" placeholder="Notice (e.g. Starts at 6:30 PM IST)" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm">
+                  <textarea id="editRules" rows="2" placeholder="Rules" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm"></textarea>
+                  <label class="inline-flex items-center gap-2 text-xs text-slate-300">
+                    <input id="editPublishNow" type="checkbox" class="accent-emerald-500">
+                    Published (visible to players)
+                  </label>
+                  <p id="editTournamentMeta" class="text-xs text-slate-500"></p>
+                  <div class="flex flex-wrap gap-2 mt-2">
+                    <button type="button" id="updateTournamentBtn" class="bg-violet-600 hover:bg-violet-500 text-white rounded-xl px-4 py-2 text-sm font-bold">Update Tournament</button>
+                    <button type="button" id="deleteEditTournamentBtn" class="bg-rose-950/80 hover:bg-rose-950 border border-rose-800/60 text-rose-300 rounded-xl px-4 py-2 text-sm font-semibold">Delete Tournament</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="glass rounded-2xl p-4 sm:p-5">
+                <h3 class="text-amber-300 font-bold mb-3">Tournament Notice</h3>
+                <p class="text-xs text-slate-400 mb-3">Set a time or announcement visible on the tournament card (e.g. &quot;Starts at 6:30 PM IST&quot;).</p>
+                <select id="noticeTournamentSelect" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm mb-2">
+                  <option value="">Select tournament</option>
+                </select>
+                <textarea id="noticeTournamentText" rows="2" placeholder="Notice text (shown with clock icon on match card)" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm"></textarea>
+                <button type="button" id="saveTournamentNoticeBtn" class="mt-3 bg-amber-600 hover:bg-amber-500 text-slate-950 rounded-xl px-4 py-2 text-sm font-bold">Save Notice</button>
+              </div>
+
+              <div class="glass rounded-2xl p-4 sm:p-5">
+                <h3 class="text-sky-300 font-bold mb-3">Set Featured Tournament</h3>
+                <p class="text-xs text-slate-400 mb-3">Choose a tournament to highlight above Live Matches. Only one can be featured at a time.</p>
+                <div class="flex flex-col sm:flex-row flex-wrap gap-2 items-stretch sm:items-center">
+                  <select id="featuredTournamentSelect" class="flex-1 min-w-[200px] bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm">
+                    <option value="">Select tournament</option>
+                  </select>
+                  <button type="button" id="setFeaturedBtn" class="bg-sky-600 hover:bg-sky-500 text-white rounded-xl px-4 py-2 text-sm font-bold">Set as Featured</button>
+                  <button type="button" id="removeFeaturedBtn" class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 rounded-xl px-4 py-2 text-sm font-semibold">Remove Featured</button>
+                </div>
+                <p id="featuredAdminStatus" class="text-xs text-slate-500 mt-2">No featured tournament selected.</p>
               </div>
 
               <div class="glass rounded-2xl p-4 sm:p-5">
@@ -403,8 +669,8 @@
                 <p class="text-xs text-slate-400 mb-3">
                   Use Publish / Unpublish to control whether a tournament appears to regular users.
                 </p>
-                <div class="overflow-x-auto">
-                  <table class="w-full text-xs sm:text-sm">
+                <div class="admin-table-scroll">
+                  <table class="admin-data-table w-full text-xs sm:text-sm">
                     <thead class="bg-slate-950 text-slate-400">
                       <tr>
                         <th class="p-2 text-left">Title</th>
@@ -432,42 +698,21 @@
               <div class="glass rounded-2xl p-4 sm:p-5">
                 <h3 class="text-amber-400 font-bold mb-3">Distribute Prizes</h3>
                 <select id="prizeTournamentSelect" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm w-full md:w-72 mb-3"></select>
-                <div class="space-y-2 mb-3">
-                  <div class="prize-row grid grid-cols-2 md:grid-cols-4 gap-2">
-                    <input type="number" class="rank bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" placeholder="Rank">
-                    <input type="text" class="ign bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" placeholder="IGN">
-                    <input type="text" class="uid bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" placeholder="UID">
-                    <input type="number" class="prizeAmount bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" placeholder="Prize">
-                  </div>
-                  <div class="prize-row grid grid-cols-2 md:grid-cols-4 gap-2">
-                    <input type="number" class="rank bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" placeholder="Rank">
-                    <input type="text" class="ign bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" placeholder="IGN">
-                    <input type="text" class="uid bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" placeholder="UID">
-                    <input type="number" class="prizeAmount bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" placeholder="Prize">
-                  </div>
+                <p class="text-xs text-slate-400 mb-2">Add up to 20 winners per distribution. All four fields are required for each winner row you submit.</p>
+                <div id="prizeWinnerRows" class="space-y-2 mb-3 max-h-80 overflow-y-auto pr-1"></div>
+                <div class="flex flex-wrap items-center gap-2 mb-3">
+                  <button type="button" id="addPrizeWinnerBtn" class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-100 rounded-lg px-3 py-1.5 text-xs font-semibold">+ Add Winner</button>
+                  <button type="button" id="removePrizeWinnerBtn" class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-100 rounded-lg px-3 py-1.5 text-xs font-semibold">Remove Last</button>
+                  <span id="prizeRowCount" class="text-xs text-slate-400 ml-auto">0 / 20 rows</span>
                 </div>
-                <button id="distributeBtn" class="bg-emerald-500 text-slate-950 rounded-xl px-4 py-2 text-sm font-bold">Distribute Prizes</button>
+                <button type="button" id="distributeBtn" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 rounded-xl px-4 py-2 text-sm font-bold">Distribute Prizes</button>
               </div>
             </section>
           </div>
 
           <!-- Right: widgets -->
           <aside class="lg:col-span-4 space-y-5">
-            <div class="gradient-outline glass rounded-2xl p-5 card-hover animate__animated animate__fadeInUp">
-              <p class="text-emerald-400 text-xs uppercase tracking-wider font-semibold">Featured Tournament</p>
-              <h4 class="text-xl font-black mt-1">Elite Clash Grand Finals</h4>
-              <p class="text-slate-300 text-sm mt-1">Starts in <span class="font-semibold text-amber-300">2 days 4 hours</span></p>
-              <p class="text-slate-400 text-sm mt-2">High-stakes finals with intense squad fights. Register early to secure your slot.</p>
-              <div class="mt-4 flex items-center justify-between">
-                <div>
-                  <p class="text-xs text-slate-400">Prize Pool</p>
-                  <p class="text-2xl font-black text-emerald-400">₹25,000</p>
-                </div>
-                <button id="featuredRegisterBtn" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 rounded-xl px-4 py-2 text-sm font-bold">
-                  Register Now
-                </button>
-              </div>
-            </div>
+            <div id="featuredTournamentSidebar" class="animate__animated animate__fadeInUp"></div>
 
             <div class="glass rounded-2xl p-5 card-hover animate__animated animate__fadeInUp">
               <h4 class="section-heading">⚙️ How It Works</h4>
@@ -493,6 +738,27 @@
                     <p class="text-xs text-slate-400">Room ID/password are visible only after you join (or for admins).</p>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <div class="glass rounded-2xl p-5 animate__animated animate__fadeInUp">
+              <h4 class="section-heading">🪙 Refer & Earn Coins</h4>
+              <p class="text-xs text-slate-400 mb-2">Share your link — earn <span id="referralRewardText">100</span> coins per signup (≈ ₹<span id="referralRewardRupees">20</span> entry value).</p>
+              <p class="text-[10px] text-slate-500 mb-2">1 coin = ₹<span id="coinRateDisplay">0.20</span> · Coins are for entries only.</p>
+              <div class="flex gap-2">
+                <input id="referralLinkInput" type="text" readonly
+                  class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-2 py-2 text-[11px] text-slate-300 truncate">
+                <button type="button" id="copyReferralBtn" class="shrink-0 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl px-3 py-2 text-xs">Copy</button>
+              </div>
+              <p class="text-[10px] text-slate-500 mt-2">Your code: <span id="referralCodeDisplay" class="text-amber-300 font-semibold">—</span></p>
+              <p class="text-xs text-slate-400 mt-3">Successful referrals: <span id="referralCountDisplay" class="text-emerald-400 font-bold">0</span></p>
+              <div id="referredUsersList" class="mt-3 max-h-40 overflow-y-auto text-xs space-y-2"></div>
+            </div>
+
+            <div class="glass rounded-2xl p-5 animate__animated animate__fadeInUp">
+              <h4 class="section-heading">🏆 Top Referrers</h4>
+              <div id="referralLeaderboardPublic" class="text-xs text-slate-400 space-y-2">
+                <p class="text-slate-500">Loading...</p>
               </div>
             </div>
 
@@ -568,6 +834,10 @@
             </div>
           </div>
           <p class="text-xs text-slate-500 mt-5">© <span id="footerYear"></span> Nexmill Arena. All rights reserved.</p>
+          <p class="text-[11px] text-slate-500 mt-2">
+            For any issues, contact:
+            <a href="mailto:kushalsaini0007@gmail.com" class="text-emerald-400 hover:text-emerald-300 underline">kushalsaini0007@gmail.com</a>
+          </p>
         </div>
       </footer>
     </div>
@@ -580,8 +850,37 @@
           <button class="modal-close text-slate-400 hover:text-white" data-close="#depositModal">✕</button>
         </div>
         <div class="flex justify-center mb-3">
-          <div class="bg-white rounded-xl p-2">
-            <img src="myqr.png" alt="UPI QR" class="w-36 h-36 object-contain" onerror="this.closest('div').style.display='none'">
+          <div class="w-full max-w-[220px]">
+            <div class="deposit-qr-card relative rounded-3xl p-6 border-2 border-emerald-500/30 shadow-2xl shadow-emerald-500/20 ring-1 ring-emerald-500/20 ring-inset overflow-hidden">
+              <span class="deposit-qr-notch deposit-qr-notch-tl" aria-hidden="true"></span>
+              <span class="deposit-qr-notch deposit-qr-notch-tr" aria-hidden="true"></span>
+              <span class="deposit-qr-notch deposit-qr-notch-bl" aria-hidden="true"></span>
+              <span class="deposit-qr-notch deposit-qr-notch-br" aria-hidden="true"></span>
+              <div class="relative z-[1] flex items-center justify-center min-h-[160px]">
+                <img id="depositQrImage" src="/myqr.png" alt="UPI QR code" width="160" height="160"
+                     class="max-w-[160px] w-full h-auto object-contain mx-auto block"
+                     onload="this.classList.remove('hidden');this.nextElementSibling?.classList.add('hidden')"
+                     onerror="this.classList.add('hidden');this.nextElementSibling?.classList.remove('hidden')">
+                <div id="depositQrPlaceholder" class="hidden w-full max-w-[160px] mx-auto aspect-square rounded-2xl border-2 border-dashed border-emerald-500/35 bg-white flex flex-col items-center justify-center gap-2.5 text-slate-500"
+                     role="img" aria-label="Scan to Pay">
+                  <svg class="w-11 h-11 text-emerald-500/75" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <rect x="3" y="3" width="7" height="7" rx="1" stroke-linecap="round"/>
+                    <rect x="14" y="3" width="7" height="7" rx="1" stroke-linecap="round"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1" stroke-linecap="round"/>
+                    <path stroke-linecap="round" d="M14 14h2v2h-2zM18 14h3v3h-3zM14 18h2v3h-2zM18 18h3v3h-3z"/>
+                  </svg>
+                  <span class="text-sm font-semibold tracking-wide text-slate-600">Scan to Pay</span>
+                </div>
+              </div>
+              <p class="relative z-[1] mt-4 text-center text-sm font-medium text-slate-500 font-mono flex items-center justify-center gap-2">
+                <svg class="w-4 h-4 text-emerald-500/80 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 12h2l2-3 2 6 2-3h2"/>
+                </svg>
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shrink-0" aria-hidden="true"></span>
+                Scan with any UPI app
+              </p>
+            </div>
           </div>
         </div>
         <button id="upiCopyBtn" class="w-full bg-emerald-500/10 border border-emerald-500/40 text-emerald-300 rounded-xl py-2 text-sm mb-3">
@@ -623,7 +922,19 @@
           <button class="modal-close text-slate-400 hover:text-white" data-close="#joinModal">✕</button>
         </div>
         <input id="joinIgn" type="text" placeholder="IGN" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm mb-2">
-        <input id="joinUid" type="text" placeholder="UID" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm mb-3">
+        <input id="joinUid" type="text" placeholder="UID" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm mb-2">
+        <div id="joinPaymentSection" class="hidden mb-3 p-3 rounded-xl bg-slate-950/80 border border-slate-700 text-xs space-y-2">
+          <p id="joinFeeSummary" class="text-slate-300"></p>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="joinPayment" value="wallet" checked class="accent-emerald-500">
+            <span>Pay with wallet (₹)</span>
+          </label>
+          <label id="joinPayCoinsLabel" class="flex items-center gap-2 cursor-pointer hidden">
+            <input type="radio" name="joinPayment" value="coins" class="accent-amber-500">
+            <span id="joinPayCoinsText">Pay with coins</span>
+          </label>
+          <p class="text-[10px] text-slate-500">Coins cannot be withdrawn — only used for entry fees. Prizes go to your wallet.</p>
+        </div>
         <div class="flex justify-end gap-2">
           <button class="modal-close text-slate-400 px-3 py-1" data-close="#joinModal">Cancel</button>
           <button id="joinConfirmBtn" class="bg-emerald-500 text-slate-950 font-bold rounded-lg px-4 py-1.5 text-sm">Confirm Join</button>
@@ -647,7 +958,11 @@
     // =========================
     const AUTH_STORAGE_KEY = 'nexmillUser';
     const API_BASE_STORAGE_KEY = 'nexmillApiBase';
+    const REFERRAL_PENDING_KEY = 'nexmillPendingReferral';
     const UPI_ID = 'kushalsaini0007@ybl';
+    const DEFAULT_PRIZE_WINNER_ROWS = 5;
+    const MAX_PRIZE_WINNER_ROWS = 20;
+    const MIN_PRIZE_WINNER_ROWS = 1;
 
     let apiBase = null;
     let apiReadyPromise = null;
@@ -655,22 +970,37 @@
     let currentUser = null;
     let tournaments = [];
     let walletBalance = 0;
+    let coinsBalance = 0;
+    let coinRate = 0.2;
+    let referralCoinsReward = 100;
     let activeJoinTournamentId = null;
+    let activeJoinEntryFeeRupees = 0;
+    let activeJoinRequiredCoins = 0;
     let adminPanelOpen = false;
+    let adminNotificationToastTimer = null;
+    let adminNotificationListTimer = null;
+    let adminNotificationsInitialized = false;
+    const seenAdminNotificationIds = new Set();
     let toastTimer = null;
     let leaderboardCache = [];
     let adminTournamentsCache = [];
+    let featuredTournament = null;
+    let liveStreamSettings = null;
+    let liveStreamLogoPending = '';
 
     const $ = (id) => document.getElementById(id);
 
-    // =========================
-    // Logging helpers (detailed, as requested)
-    // =========================
+    const IS_DEV_UI = (() => {
+      const h = window.location.hostname;
+      return h === 'localhost' || h === '127.0.0.1';
+    })();
+
     const log = {
-      info: (...args) => console.log('[NEXMILL]', ...args),
-      warn: (...args) => console.warn('[NEXMILL]', ...args),
-      error: (...args) => console.error('[NEXMILL]', ...args),
+      info: (...args) => { if (IS_DEV_UI) console.log('[NEXMILL]', ...args); },
+      warn: (...args) => { if (IS_DEV_UI) console.warn('[NEXMILL]', ...args); },
+      error: (...args) => { if (IS_DEV_UI) console.error('[NEXMILL]', ...args); },
       group: (title, fn) => {
+        if (!IS_DEV_UI) return;
         try {
           console.groupCollapsed(`[NEXMILL] ${title}`);
           fn?.();
@@ -681,10 +1011,11 @@
     };
 
     window.addEventListener('error', (e) => {
-      log.error('Global error:', e?.message, e?.error);
+      e?.preventDefault?.();
+      log.error('Application error');
     });
-    window.addEventListener('unhandledrejection', (e) => {
-      log.error('Unhandled promise rejection:', e?.reason);
+    window.addEventListener('unhandledrejection', () => {
+      log.error('Request failed');
     });
 
     // =========================
@@ -735,11 +1066,22 @@
       }
     };
 
+    const refreshDepositQrImage = () => {
+      const img = $('depositQrImage');
+      const placeholder = $('depositQrPlaceholder');
+      if (!img) return;
+      img.classList.remove('hidden');
+      placeholder?.classList.add('hidden');
+      const base = (window.location.origin || '').replace(/\/+$/, '');
+      img.src = `${base}/myqr.png?v=${Date.now()}`;
+    };
+
     const openModal = (modalId) => {
       const modal = $(modalId);
       if (!modal) return;
       modal.classList.remove('hidden');
       modal.classList.add('flex');
+      if (modalId === 'depositModal') refreshDepositQrImage();
     };
 
     const closeModal = (modalId) => {
@@ -779,10 +1121,16 @@
       }
     };
 
-    const setCurrentUser = (user) => {
-      currentUser = user || null;
-      if (user) localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-      else localStorage.removeItem(AUTH_STORAGE_KEY);
+    const setCurrentUser = (userOrPayload) => {
+      if (!userOrPayload) {
+        currentUser = null;
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+        return;
+      }
+      const base = userOrPayload.user || userOrPayload;
+      const token = userOrPayload.token || base.token || null;
+      currentUser = token ? { ...base, token } : { ...base };
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(currentUser));
     };
 
     // =========================
@@ -803,8 +1151,21 @@
       }
     };
 
+    const isSameOriginBase = (base) => {
+      const origin = normalizeBase(window.location.origin || '');
+      return origin && base && normalizeBase(base) === origin;
+    };
+
+    const apiUrl = (path) => {
+      const p = path.startsWith('/') ? path : `/${path}`;
+      const suffix = p.startsWith('/api') ? p : `/api${p}`;
+      if (apiBase && isSameOriginBase(apiBase)) return suffix;
+      const base = normalizeBase(apiBase || window.location.origin || '');
+      return base ? `${base}${suffix}` : suffix;
+    };
+
     const probeApiBase = async (base) => {
-      const url = `${base}/api/tournaments`;
+      const url = isSameOriginBase(base) ? '/api/tournaments' : `${base}/api/tournaments`;
       const controller = new AbortController();
       const t = setTimeout(() => controller.abort(), 2500);
       try {
@@ -827,22 +1188,21 @@
 
     const resolveApiBase = async () => {
       const candidates = [];
-
-      const explicit = normalizeBase(window.API_BASE_URL || localStorage.getItem(API_BASE_STORAGE_KEY) || metaApiBase());
-      if (explicit) candidates.push(explicit);
-
-      // Typical production: backend serves frontend from same origin
-      if (window.location?.origin && window.location.origin !== 'null') candidates.push(normalizeBase(window.location.origin));
-
-      // Local dev: frontend might run on 3000/5173/5500 but backend on 5000
       const host = window.location.hostname;
       const isLocal = host === 'localhost' || host === '127.0.0.1';
+      const explicit = normalizeBase(window.API_BASE_URL || localStorage.getItem(API_BASE_STORAGE_KEY) || metaApiBase());
+
+      // Production (Render): same origin serves API + frontend — prefer this first
+      if (window.location?.origin && window.location.origin !== 'null') {
+        candidates.push(normalizeBase(window.location.origin));
+      }
+      if (explicit && !candidates.includes(explicit)) candidates.push(explicit);
+
+      // Local dev only: backend may run on port 5000 while UI is on another port
       if (isLocal) {
         candidates.push('http://localhost:5000');
         candidates.push('http://127.0.0.1:5000');
         candidates.push(`http://${host}:5000`);
-      } else if (window.location.protocol.startsWith('http') && window.location.port && window.location.port !== '5000') {
-        candidates.push(`${window.location.protocol}//${host}:5000`);
       }
 
       // Deduplicate
@@ -885,23 +1245,39 @@
       }
     };
 
-    const api = (path) => `${apiBase}/api${path}`;
-
     const authHeaders = (extra = {}) => {
       const headers = { 'Content-Type': 'application/json', Accept: 'application/json', ...extra };
       const user = getCurrentUser();
-      if (user && user.id) headers['x-user-id'] = user.id;
+      if (user?.token) headers.Authorization = `Bearer ${user.token}`;
+      else if (user?.id) headers['x-user-id'] = user.id;
       return headers;
+    };
+
+    const redactAuthHeaders = (headers = {}) => {
+      const safe = { ...headers };
+      if (safe.Authorization) safe.Authorization = 'Bearer [redacted]';
+      if (safe['x-user-id']) safe['x-user-id'] = '[redacted]';
+      return safe;
     };
 
     const parseResponse = async (res) => {
       const text = await res.text();
-      try { return text ? JSON.parse(text) : {}; } catch { return { message: 'Invalid server response' }; }
+      try {
+        const data = text ? JSON.parse(text) : {};
+        if (data && typeof data === 'object') {
+          delete data.stack;
+          delete data.error;
+          delete data.details;
+        }
+        return data;
+      } catch {
+        return { message: 'Invalid server response' };
+      }
     };
 
     const apiFetch = async (path, options = {}) => {
       await ensureApiReady(true);
-      const url = api(path);
+      const url = apiUrl(path);
       const controller = new AbortController();
       const timeoutMs = Number(options.timeoutMs || 12000);
       const t = setTimeout(() => controller.abort(), timeoutMs);
@@ -910,11 +1286,17 @@
       delete opts.timeoutMs;
 
       log.group(`HTTP ${opts.method || 'GET'} ${url}`, () => {
-        log.info('options:', { ...opts, headers: opts.headers });
+        log.info('options:', { ...opts, headers: redactAuthHeaders(opts.headers) });
       });
 
       try {
-        return await fetch(url, opts);
+        const res = await fetch(url, opts);
+        if (res.status === 401 && getCurrentUser() && !path.startsWith('/auth/')) {
+          setCurrentUser(null);
+          showAuth();
+          showToast('Session expired', 'Please log in again.', '✕');
+        }
+        return res;
       } catch (err) {
         log.error('Network/API error:', err);
         throw err;
@@ -926,6 +1308,26 @@
     // =========================
     // Auth
     // =========================
+    const updateSignupButtonState = () => {
+      const btn = $('signupBtn');
+      const agree = $('signupAgreeCheckbox');
+      if (btn && agree) btn.disabled = !agree.checked;
+    };
+
+    const switchAuthMethod = (method) => {
+      const emailBtn = $('authMethodEmail');
+      const phoneBtn = $('authMethodPhone');
+      const emailSection = $('emailAuthSection');
+      const phoneForm = $('phoneLoginForm');
+      if (!emailBtn || !phoneBtn) return;
+      const isPhone = method === 'phone';
+      emailBtn.classList.toggle('auth-tab-active', !isPhone);
+      phoneBtn.classList.toggle('auth-tab-active', isPhone);
+      emailSection?.classList.toggle('hidden', isPhone);
+      phoneForm?.classList.toggle('hidden', !isPhone);
+      showAuthError('');
+    };
+
     const toggleAuthTab = (tab) => {
       const loginTab = $('authTabLogin');
       const signupTab = $('authTabSignup');
@@ -945,7 +1347,53 @@
         signupTab.classList.remove('auth-tab-active');
       }
       showAuthError('');
+      updateSignupButtonState();
     };
+
+    async function handlePhoneLogin(e) {
+      try { e?.preventDefault?.(); } catch {}
+      showAuthError('');
+
+      const phone = ($('loginPhone')?.value || '').trim().replace(/\s+/g, '');
+      const password = $('phoneLoginPasswordInput')?.value || '';
+
+      if (!phone || !password) {
+        showAuthError('Enter phone number and password.');
+        return false;
+      }
+
+      await ensureApiReady(false);
+      const btn = $('phoneLoginBtn');
+      setButtonLoading(btn, true, 'Logging in...');
+
+      console.log('[Phone Login] POST /auth/login', { phone, passwordLength: password.length });
+
+      try {
+        const res = await apiFetch('/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, password })
+        });
+        const data = await parseResponse(res);
+        console.log('[Phone Login] response', res.status, data);
+        if (!res.ok || !data.user || !data.user.id) {
+          showAuthError(data.message || 'Invalid phone or password.');
+          showToast('Login failed', data.message || 'Invalid credentials', '✕');
+          return false;
+        }
+        setCurrentUser({ user: data.user, token: data.token });
+        showToast('Welcome', `Logged in as ${data.user.name}`, '✓');
+        showDashboard();
+        return false;
+      } catch (err) {
+        log.error('handlePhoneLogin error:', err);
+        showAuthError('Network error. Unable to reach server.');
+        showToast('Network error', 'Unable to reach server. Check API base / backend port.', '✕');
+        return false;
+      } finally {
+        setButtonLoading(btn, false);
+      }
+    }
 
     const showDashboard = () => {
       $('authModal')?.classList.add('hidden');
@@ -959,9 +1407,18 @@
       hideAdminPanel();
 
       fetchTournaments();
+      fetchFeaturedTournament();
+      fetchLiveStream();
       fetchWallet();
+      fetchReferralInfo();
+      fetchPublicReferralLeaderboard();
+      fetchReferralConfig();
       fetchWinners();
       fetchLeaderboard();
+      if (user.isAdmin) {
+        fetchAdminReferralLeaderboard();
+        startAdminNotificationPolling();
+      }
     };
 
     const showAuth = () => {
@@ -999,7 +1456,7 @@
           showToast('Login failed', data.message || 'Invalid credentials', '✕');
           return false;
         }
-        setCurrentUser(data.user);
+        setCurrentUser({ user: data.user, token: data.token });
         showToast('Welcome', `Logged in as ${data.user.name}`, '✓');
         showDashboard();
         return false;
@@ -1019,10 +1476,19 @@
 
       const name = ($('signupNameInput')?.value || '').trim();
       const email = ($('signupEmailInput')?.value || '').trim().toLowerCase();
+      const phone = ($('signupPhoneInput')?.value || '').trim().replace(/\s+/g, '');
       const password = $('signupPasswordInput')?.value || '';
 
-      if (!name || !email || !password) {
-        showAuthError('Please fill all signup fields.');
+      if (!name || !password) {
+        showAuthError('Name and password are required.');
+        return false;
+      }
+      if (!email && !phone) {
+        showAuthError('Provide an email or phone number.');
+        return false;
+      }
+      if (!$('signupAgreeCheckbox')?.checked) {
+        showAuthError('Please agree to the terms before signing up.');
         return false;
       }
 
@@ -1032,10 +1498,22 @@
       setButtonLoading(btn, true, 'Creating account...');
 
       try {
-        const res = await apiFetch('/auth/signup', {
+        const referralCode = ($('signupReferralInput')?.value || getPendingReferralCode() || '').trim().toUpperCase();
+        const signupBody = { name, password };
+        if (email) signupBody.email = email;
+        if (phone) signupBody.phone = phone;
+        if (referralCode) {
+          signupBody.ref = referralCode;
+          signupBody.referralCode = referralCode;
+        }
+        const signupPath = referralCode
+          ? `/auth/signup?ref=${encodeURIComponent(referralCode)}`
+          : '/auth/signup';
+
+        const res = await apiFetch(signupPath, {
           method: 'POST',
           headers: authHeaders(),
-          body: JSON.stringify({ name, email, password })
+          body: JSON.stringify(signupBody)
         });
         const data = await parseResponse(res);
         if (!res.ok || !data.user) {
@@ -1043,7 +1521,7 @@
           showToast('Signup failed', data.message || 'Try again', '✕');
           return false;
         }
-        setCurrentUser(data.user);
+        setCurrentUser({ user: data.user, token: data.token });
         showToast('Account created', `Welcome ${data.user.name}`, '✓');
         showDashboard();
         return false;
@@ -1058,6 +1536,7 @@
     }
 
     const handleLogout = () => {
+      stopAdminNotificationPolling();
       setCurrentUser(null);
       showAuth();
     };
@@ -1104,6 +1583,541 @@
       return t.participants.some((p) => p.userId && String(p.userId) === String(userId));
     };
 
+    const buildNoticeHtml = (notice) => {
+      const text = (notice || '').trim();
+      if (!text) return '';
+      return `<div class="notice-banner"><span aria-hidden="true">🕐</span><span>${escapeHtml(text)}</span></div>`;
+    };
+
+    const refreshAllTournamentLists = async () => {
+      const user = getCurrentUser();
+      await fetchTournaments();
+      if (user?.isAdmin) {
+        await fetchAdminTournaments();
+      } else {
+        populateTournamentSelects();
+      }
+      await fetchFeaturedTournament();
+    };
+
+    const extractYoutubeVideoId = (input) => {
+      let raw = String(input || '').trim();
+      if (!raw) return '';
+      if (/^[a-zA-Z0-9_-]{11}$/.test(raw)) return raw;
+      if (!/^https?:\/\//i.test(raw)) {
+        raw = raw.startsWith('//') ? `https:${raw}` : `https://${raw}`;
+      }
+      try {
+        const url = new URL(raw);
+        const host = url.hostname.replace(/^www\./i, '').toLowerCase();
+        if (host === 'youtu.be' || host.endsWith('.youtu.be')) {
+          const id = url.pathname.replace(/^\//, '').split(/[/?&#]/)[0];
+          if (/^[a-zA-Z0-9_-]{11}$/.test(id)) return id;
+        }
+        if (host.includes('youtube.com') || host.includes('youtube-nocookie.com')) {
+          const v = url.searchParams.get('v');
+          if (v) {
+            const match = v.match(/^([a-zA-Z0-9_-]{11})/);
+            if (match) return match[1];
+          }
+          const pathPatterns = [
+            /\/embed\/([a-zA-Z0-9_-]{11})/,
+            /\/live\/([a-zA-Z0-9_-]{11})/,
+            /\/shorts\/([a-zA-Z0-9_-]{11})/,
+            /\/v\/([a-zA-Z0-9_-]{11})/
+          ];
+          for (const pattern of pathPatterns) {
+            const m = url.pathname.match(pattern);
+            if (m) return m[1];
+          }
+        }
+      } catch (_) {}
+      const generic = raw.match(/(?:[?&]v=|\/embed\/|youtu\.be\/|\/shorts\/|\/live\/|\/v\/)([a-zA-Z0-9_-]{11})/);
+      return generic ? generic[1] : '';
+    };
+
+    const normalizeLiveStreamSettings = (data) => {
+      if (!data || typeof data !== 'object') {
+        return { show: false, youtubeUrl: '', title: '', schedule: '', description: '', channelLogo: '', videoId: '' };
+      }
+      const youtubeUrl = String(data.youtubeUrl || '').trim();
+      const videoId = String(data.videoId || extractYoutubeVideoId(youtubeUrl) || '').trim();
+      return {
+        show: !!data.show,
+        youtubeUrl,
+        videoId,
+        title: data.title || '',
+        schedule: data.schedule || '',
+        description: data.description || '',
+        channelLogo: data.channelLogo || ''
+      };
+    };
+
+    const getYoutubeWatchUrl = (settings) => {
+      const url = (settings?.youtubeUrl || '').trim();
+      if (url && /^https?:\/\//i.test(url)) return url;
+      if (url) return `https://${url.replace(/^\/\//, '')}`;
+      if (settings?.videoId) return `https://www.youtube.com/watch?v=${settings.videoId}`;
+      return '';
+    };
+
+    const channelLogoSrc = (logo) => {
+      const raw = (logo || '').trim();
+      if (!raw) return '';
+      if (raw.startsWith('data:')) return raw;
+      if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
+      return `data:image/png;base64,${raw}`;
+    };
+
+    const updateLiveStreamLogoPreview = (src) => {
+      const preview = $('liveStreamLogoPreview');
+      if (!preview) return;
+      if (src) {
+        preview.src = src;
+        preview.classList.remove('hidden');
+      } else {
+        preview.src = '';
+        preview.classList.add('hidden');
+      }
+    };
+
+    const populateLiveStreamAdminForm = () => {
+      const s = liveStreamSettings || {};
+      if ($('liveStreamShowInput')) $('liveStreamShowInput').checked = !!s.show;
+      if ($('liveStreamYoutubeInput')) $('liveStreamYoutubeInput').value = s.youtubeUrl || '';
+      if ($('liveStreamTitleInput')) $('liveStreamTitleInput').value = s.title || '';
+      if ($('liveStreamScheduleInput')) $('liveStreamScheduleInput').value = s.schedule || '';
+      if ($('liveStreamDescInput')) $('liveStreamDescInput').value = s.description || '';
+      liveStreamLogoPending = s.channelLogo || '';
+      updateLiveStreamLogoPreview(channelLogoSrc(liveStreamLogoPending));
+      if ($('liveStreamLogoFile')) $('liveStreamLogoFile').value = '';
+    };
+
+    const renderLiveStream = () => {
+      const container = $('liveStreamContainer');
+      if (!container) return;
+      const s = normalizeLiveStreamSettings(liveStreamSettings);
+      liveStreamSettings = s;
+
+      const placeholderHtml = `
+        <div class="text-center py-8 sm:py-10">
+          <p class="text-sky-300 text-xs uppercase tracking-wider font-semibold">Live Stream</p>
+          <h2 class="text-xl sm:text-2xl font-black mt-2 text-slate-200">No live stream scheduled</h2>
+          <p class="text-slate-400 text-sm mt-2 max-w-lg mx-auto">Check back later for the next broadcast or browse live tournaments below.</p>
+        </div>
+      `;
+
+      if (!s.show) {
+        container.innerHTML = placeholderHtml;
+        return;
+      }
+
+      const videoId = s.videoId || extractYoutubeVideoId(s.youtubeUrl);
+      const watchUrl = getYoutubeWatchUrl({ ...s, videoId });
+
+      if (!videoId) {
+        container.innerHTML = `
+          <div class="text-center py-8 sm:py-10">
+            <p class="text-sky-300 text-xs uppercase tracking-wider font-semibold">Live Stream</p>
+            <p class="text-rose-300 text-sm mt-3 max-w-lg mx-auto">Invalid YouTube URL. Please check the link in admin settings.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const embedUrl = `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?rel=0`;
+      const logoSrc = channelLogoSrc(s.channelLogo);
+      const logoHtml = logoSrc
+        ? `<img src="${logoSrc.replace(/"/g, '&quot;')}" alt="Channel logo" class="channel-logo shrink-0" onerror="this.style.display='none'">`
+        : `<div class="channel-logo shrink-0 flex items-center justify-center text-emerald-400 font-black text-lg">NM</div>`;
+      const safeWatchUrl = watchUrl.replace(/"/g, '&quot;');
+
+      container.innerHTML = `
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <div class="lg:col-span-8">
+            <div class="live-stream-video-wrap">
+              <iframe
+                src="${embedUrl}"
+                title="${escapeHtml(s.title || 'Live Stream')}"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+                loading="lazy"
+                referrerpolicy="strict-origin-when-cross-origin"
+              ></iframe>
+            </div>
+            <a
+              href="${safeWatchUrl}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-3 inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl px-5 py-2.5 text-sm transition-colors"
+            >
+              ▶ Watch on YouTube
+            </a>
+          </div>
+          <div class="lg:col-span-4 flex flex-col justify-center">
+            <div class="flex items-start gap-3">
+              ${logoHtml}
+              <div class="min-w-0">
+                <p class="text-rose-300 text-xs uppercase tracking-wider font-semibold">🔴 Live Now</p>
+                <h2 class="text-xl sm:text-2xl font-black mt-1 leading-tight">${escapeHtml(s.title || 'Live Stream')}</h2>
+                ${s.schedule ? `<p class="text-amber-300 text-sm mt-2 font-semibold">🕐 ${escapeHtml(s.schedule)}</p>` : ''}
+                ${s.description ? `<p class="text-slate-400 text-sm mt-2">${escapeHtml(s.description)}</p>` : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    };
+
+    const fetchLiveStream = async () => {
+      const user = getCurrentUser();
+      const headers = user?.isAdmin ? authHeaders() : {};
+      try {
+        const res = await apiFetch('/live-stream', { method: 'GET', headers });
+        const data = await parseResponse(res);
+        liveStreamSettings = normalizeLiveStreamSettings(data);
+        renderLiveStream();
+        if (user?.isAdmin) populateLiveStreamAdminForm();
+      } catch (err) {
+        log.error('fetchLiveStream failed:', err);
+        liveStreamSettings = normalizeLiveStreamSettings({ show: false });
+        renderLiveStream();
+      }
+    };
+
+    const handleLiveStreamLogoFile = (e) => {
+      const file = e.target?.files?.[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        showToast('Error', 'Please select an image file.', '✕');
+        return;
+      }
+      if (file.size > 4 * 1024 * 1024) {
+        showToast('Error', 'Image must be under 4 MB.', '✕');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        liveStreamLogoPending = reader.result || '';
+        updateLiveStreamLogoPreview(liveStreamLogoPending);
+      };
+      reader.readAsDataURL(file);
+    };
+
+    const saveLiveStreamSettings = async () => {
+      const user = getCurrentUser();
+      if (!user || !user.isAdmin) return;
+      const youtubeUrl = ($('liveStreamYoutubeInput')?.value || '').trim();
+      const show = !!($('liveStreamShowInput')?.checked);
+      if (show && youtubeUrl && !extractYoutubeVideoId(youtubeUrl)) {
+        showToast('Error', 'Enter a valid YouTube URL.', '✕');
+        return;
+      }
+      const btn = $('saveLiveStreamBtn');
+      setButtonLoading(btn, true, 'Saving...');
+      try {
+        const res = await apiFetch('/admin/live-stream', {
+          method: 'PUT',
+          headers: authHeaders(),
+          body: JSON.stringify({
+            show,
+            youtubeUrl,
+            title: ($('liveStreamTitleInput')?.value || '').trim(),
+            schedule: ($('liveStreamScheduleInput')?.value || '').trim(),
+            description: ($('liveStreamDescInput')?.value || '').trim(),
+            channelLogo: liveStreamLogoPending || (liveStreamSettings?.channelLogo || '')
+          })
+        });
+        const data = await parseResponse(res);
+        if (!res.ok) {
+          showToast('Error', data.message || 'Could not save live stream.', '✕');
+          return;
+        }
+        liveStreamSettings = normalizeLiveStreamSettings(data.settings || {
+          show,
+          youtubeUrl,
+          title: ($('liveStreamTitleInput')?.value || '').trim(),
+          schedule: ($('liveStreamScheduleInput')?.value || '').trim(),
+          description: ($('liveStreamDescInput')?.value || '').trim(),
+          channelLogo: liveStreamLogoPending || (liveStreamSettings?.channelLogo || '')
+        });
+        liveStreamLogoPending = liveStreamSettings.channelLogo || '';
+        populateLiveStreamAdminForm();
+        renderLiveStream();
+        showToast('Saved', 'Live stream settings updated', '✓');
+        await fetchLiveStream();
+      } catch (err) {
+        log.error('saveLiveStreamSettings failed:', err);
+        showToast('Error', 'Failed to save live stream settings.', '✕');
+      } finally {
+        setButtonLoading(btn, false);
+      }
+    };
+
+    const clearLiveStreamAdminForm = () => {
+      liveStreamLogoPending = '';
+      if ($('liveStreamShowInput')) $('liveStreamShowInput').checked = false;
+      if ($('liveStreamYoutubeInput')) $('liveStreamYoutubeInput').value = '';
+      if ($('liveStreamTitleInput')) $('liveStreamTitleInput').value = '';
+      if ($('liveStreamScheduleInput')) $('liveStreamScheduleInput').value = '';
+      if ($('liveStreamDescInput')) $('liveStreamDescInput').value = '';
+      if ($('liveStreamLogoFile')) $('liveStreamLogoFile').value = '';
+      updateLiveStreamLogoPreview('');
+    };
+
+    const deleteLiveStream = async () => {
+      const user = getCurrentUser();
+      if (!user || !user.isAdmin) return;
+      if (!window.confirm('Delete live stream settings completely? The dashboard will show no live stream until you save new settings.')) return;
+      const btn = $('deleteLiveStreamBtn');
+      setButtonLoading(btn, true, 'Deleting...');
+      try {
+        const res = await apiFetch('/admin/live-stream', {
+          method: 'DELETE',
+          headers: authHeaders()
+        });
+        const data = await parseResponse(res);
+        if (!res.ok) {
+          showToast('Error', data.message || 'Could not delete live stream.', '✕');
+          return;
+        }
+        liveStreamSettings = normalizeLiveStreamSettings({ show: false });
+        clearLiveStreamAdminForm();
+        renderLiveStream();
+        showToast('Deleted', 'Live stream deleted', '✓');
+        await fetchLiveStream();
+      } catch (err) {
+        log.error('deleteLiveStream failed:', err);
+        showToast('Error', 'Failed to delete live stream.', '✕');
+      } finally {
+        setButtonLoading(btn, false);
+      }
+    };
+
+    const buildFeaturedCardHtml = (t, { compact = false } = {}) => {
+      const user = getCurrentUser();
+      const joined = user ? isJoinedTournament(t, user.id) : false;
+      const isAdmin = !!(user && user.isAdmin);
+      const canRoom = joined || isAdmin;
+      const rulesText = (t.rules || 'Standard rules apply.').slice(0, compact ? 80 : 160);
+      const rulesSuffix = (t.rules || '').length > rulesText.length ? '…' : '';
+
+      const joinBtn = joined
+        ? `<button type="button" class="featured-join-btn bg-slate-800 text-emerald-400 font-bold rounded-xl text-sm px-4 py-2" disabled>✓ Joined</button>`
+        : user
+          ? `<button type="button" class="featured-join-btn bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-xl text-sm px-4 py-2" data-id="${t._id}" data-title="${escapeHtml(t.matchTitle)}" data-entry-fee="${escapeHtml(t.entryFee || '')}">Register Now</button>`
+          : '<p class="text-xs text-slate-500">Login to register</p>';
+
+      const roomBtn = canRoom
+        ? `<button type="button" class="featured-room-btn bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold rounded-lg text-xs px-3 py-2" data-id="${t._id}">🔑 Show Room</button>`
+        : '';
+
+      const wrapperClass = compact
+        ? 'gradient-outline glass rounded-2xl p-5 card-hover'
+        : 'gradient-outline glass rounded-2xl p-5 sm:p-6 card-hover border border-emerald-500/20';
+
+      return `
+        <article class="${wrapperClass}" data-featured-id="${t._id}">
+          <div class="flex flex-wrap items-start justify-between gap-2">
+            <p class="text-emerald-400 text-xs uppercase tracking-wider font-semibold">⭐ Featured Tournament</p>
+            <span class="text-[10px] bg-slate-950 px-2 py-1 rounded border border-slate-700">${escapeHtml(t.mapName || 'Map')}</span>
+          </div>
+          <h4 class="${compact ? 'text-xl' : 'text-2xl sm:text-3xl'} font-black mt-2 leading-tight">${escapeHtml(t.matchTitle)}</h4>
+          ${buildNoticeHtml(t.notice)}
+          <p class="text-slate-400 text-sm mt-2">${escapeHtml(rulesText)}${rulesSuffix}</p>
+          <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+            <div>
+              <p class="text-xs text-slate-500">Prize Pool</p>
+              <p class="font-black text-emerald-400">${escapeHtml(t.prizePool || '—')}</p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500">Entry</p>
+              <p class="font-semibold text-slate-200">${escapeHtml(t.entryFee || '—')}</p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500">Slots</p>
+              <p class="font-semibold text-slate-200">${Number(t.filledSlots || 0)} / ${Number(t.totalSlots || 0)}</p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500">Status</p>
+              <p class="font-semibold text-amber-300">${Number(t.filledSlots || 0) >= Number(t.totalSlots || 0) ? 'Full' : 'Open'}</p>
+            </div>
+          </div>
+          <div class="mt-4 flex flex-wrap items-center gap-2">
+            ${joinBtn}
+            ${roomBtn}
+          </div>
+          <div id="featured-room-${t._id}" class="featured-room-creds hidden text-xs mt-2 text-slate-300"></div>
+        </article>
+      `;
+    };
+
+    const renderFeaturedTournament = () => {
+      const main = $('featuredTournamentMain');
+      const sidebar = $('featuredTournamentSidebar');
+      const emptyMain = '<div class="glass rounded-2xl p-6 text-center text-slate-400 text-sm">No featured tournament at the moment.</div>';
+      const emptySide = '<div class="glass rounded-2xl p-5 text-center text-slate-500 text-sm">No featured tournament at the moment.</div>';
+
+      if (!featuredTournament) {
+        if (main) main.innerHTML = emptyMain;
+        if (sidebar) sidebar.innerHTML = emptySide;
+      } else {
+        if (main) main.innerHTML = buildFeaturedCardHtml(featuredTournament, { compact: false });
+        if (sidebar) sidebar.innerHTML = buildFeaturedCardHtml(featuredTournament, { compact: true });
+      }
+
+      const status = $('featuredAdminStatus');
+      const removeBtn = $('removeFeaturedBtn');
+      if (status) {
+        status.textContent = featuredTournament
+          ? `Currently featured: ${featuredTournament.matchTitle}`
+          : 'No featured tournament selected.';
+      }
+      if (removeBtn) {
+        removeBtn.disabled = !featuredTournament;
+        removeBtn.classList.toggle('opacity-50', !featuredTournament);
+        removeBtn.classList.toggle('cursor-not-allowed', !featuredTournament);
+      }
+    };
+
+    const fetchFeaturedTournament = async () => {
+      try {
+        const res = await apiFetch('/tournaments?featured=true', { method: 'GET' });
+        const data = await parseResponse(res);
+        if (Array.isArray(data)) {
+          featuredTournament = data[0] || null;
+        } else {
+          featuredTournament = data && data._id ? data : null;
+        }
+        renderFeaturedTournament();
+        populateFeaturedTournamentSelect();
+      } catch (err) {
+        log.error('fetchFeaturedTournament failed:', err);
+        featuredTournament = null;
+        renderFeaturedTournament();
+      }
+    };
+
+    const populateFeaturedTournamentSelect = () => {
+      const select = $('featuredTournamentSelect');
+      if (!select) return;
+      const user = getCurrentUser();
+      const source = (user && user.isAdmin && adminTournamentsCache.length)
+        ? adminTournamentsCache
+        : tournaments;
+      const options = source.map((t) => {
+        const label = `${t.matchTitle} — ${t.entryFee || 'Free'}`;
+        return `<option value="${t._id}">${escapeHtml(label)}</option>`;
+      }).join('');
+      select.innerHTML = `<option value="">Select tournament</option>${options}`;
+      if (featuredTournament?._id) {
+        select.value = String(featuredTournament._id);
+      }
+    };
+
+    const setFeaturedTournament = async () => {
+      const user = getCurrentUser();
+      if (!user || !user.isAdmin) return;
+      const tournamentId = $('featuredTournamentSelect')?.value || '';
+      if (!tournamentId) {
+        showToast('Error', 'Select a tournament to feature.', '✕');
+        return;
+      }
+      const btn = $('setFeaturedBtn');
+      setButtonLoading(btn, true, 'Saving...');
+      try {
+        const res = await apiFetch(`/tournaments/${tournamentId}/feature`, {
+          method: 'PUT',
+          headers: authHeaders()
+        });
+        const data = await parseResponse(res);
+        if (!res.ok) {
+          showToast('Error', data.message || 'Could not set featured tournament.', '✕');
+          return;
+        }
+        showToast('Done', 'Tournament set as featured', '✓');
+        featuredTournament = data.tournament || null;
+        await fetchFeaturedTournament();
+        await fetchTournaments();
+        if (adminPanelOpen) await fetchAdminTournaments();
+      } catch (err) {
+        log.error('setFeaturedTournament failed:', err);
+        showToast('Error', 'Failed to set featured tournament.', '✕');
+      } finally {
+        setButtonLoading(btn, false);
+      }
+    };
+
+    const removeFeaturedTournament = async () => {
+      const user = getCurrentUser();
+      if (!user || !user.isAdmin) return;
+      const tournamentId = featuredTournament?._id || $('featuredTournamentSelect')?.value || '';
+      if (!tournamentId) {
+        showToast('Error', 'No featured tournament to remove.', '✕');
+        return;
+      }
+      const btn = $('removeFeaturedBtn');
+      setButtonLoading(btn, true, 'Removing...');
+      try {
+        const res = await apiFetch(`/tournaments/${tournamentId}/feature`, {
+          method: 'DELETE',
+          headers: authHeaders()
+        });
+        const data = await parseResponse(res);
+        if (!res.ok) {
+          showToast('Error', data.message || 'Could not remove featured tournament.', '✕');
+          return;
+        }
+        showToast('Done', 'Featured tournament removed', '✓');
+        featuredTournament = null;
+        await fetchFeaturedTournament();
+        await fetchTournaments();
+        if (adminPanelOpen) await fetchAdminTournaments();
+      } catch (err) {
+        log.error('removeFeaturedTournament failed:', err);
+        showToast('Error', 'Failed to remove featured tournament.', '✕');
+      } finally {
+        setButtonLoading(btn, false);
+      }
+    };
+
+    const handleFeaturedCardClick = (e) => {
+      const joinBtn = e.target.closest('.featured-join-btn');
+      if (joinBtn && !joinBtn.disabled && joinBtn.dataset.id) {
+        return openJoinModal(joinBtn.dataset.id, joinBtn.dataset.title || 'Tournament', joinBtn.dataset.entryFee);
+      }
+      const roomBtn = e.target.closest('.featured-room-btn');
+      if (roomBtn && roomBtn.dataset.id) {
+        return fetchFeaturedRoomCredentials(roomBtn.dataset.id);
+      }
+    };
+
+    const fetchFeaturedRoomCredentials = async (tournamentId) => {
+      const roomBox = $(`featured-room-${tournamentId}`);
+      if (!roomBox) return;
+      try {
+        const res = await apiFetch(`/tournaments/${tournamentId}/room`, {
+          method: 'GET',
+          headers: authHeaders()
+        });
+        const data = await parseResponse(res);
+        if (!res.ok) {
+          showToast('Access denied', data.message || 'Unauthorized', '✕');
+          return;
+        }
+        roomBox.innerHTML = `
+          <div class="glass rounded-xl p-3 mt-1">
+            <p><span class="text-slate-400">Room ID:</span> <span class="font-semibold">${escapeHtml(data.roomID || 'Not set')}</span></p>
+            <p class="mt-1"><span class="text-slate-400">Password:</span> <span class="font-semibold">${escapeHtml(data.roomPass || 'Not set')}</span></p>
+          </div>
+        `;
+        roomBox.classList.remove('hidden');
+      } catch (err) {
+        log.error('fetchFeaturedRoomCredentials failed:', err);
+        showToast('Error', 'Failed to fetch room details.', '✕');
+      }
+    };
+
     const renderTournaments = () => {
       const grid = $('tournamentGrid');
       if (!grid) return;
@@ -1121,7 +2135,7 @@
         const joinBtn = joined
           ? `<button class="w-full mt-3 bg-slate-800 text-emerald-400 font-bold py-2 rounded-xl text-sm" disabled>✓ Joined</button>`
           : user
-            ? `<button class="join-btn w-full mt-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2 rounded-xl text-sm" data-id="${t._id}" data-title="${escapeHtml(t.matchTitle)}">Join Match</button>`
+            ? `<button class="join-btn w-full mt-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2 rounded-xl text-sm" data-id="${t._id}" data-title="${escapeHtml(t.matchTitle)}" data-entry-fee="${escapeHtml(t.entryFee || '')}">Join Match</button>`
             : '<p class="text-xs text-slate-500 mt-3">Login required to join</p>';
 
         const roomBtn = canRoom
@@ -1139,6 +2153,7 @@
               <h4 class="font-bold text-lg">${escapeHtml(t.matchTitle)}</h4>
               <span class="text-[10px] bg-slate-950 px-2 py-1 rounded">${escapeHtml(t.mapName)}</span>
             </div>
+            ${buildNoticeHtml(t.notice)}
             <div class="mt-2 grid grid-cols-2 gap-2 text-sm">
               <p class="text-slate-300"><span class="text-slate-500">Prize:</span> ${escapeHtml(t.prizePool)}</p>
               <p class="text-slate-300 text-right"><span class="text-slate-500">Entry:</span> ${escapeHtml(t.entryFee)}</p>
@@ -1196,8 +2211,106 @@
       }
     };
 
+    const clearEditTournamentForm = () => {
+      if ($('editTournamentSelect')) $('editTournamentSelect').value = '';
+      $('editTournamentForm')?.classList.add('hidden');
+      if ($('editMatchTitle')) $('editMatchTitle').value = '';
+      if ($('editEntryFee')) $('editEntryFee').value = '';
+      if ($('editPrizePool')) $('editPrizePool').value = '';
+      if ($('editTotalSlots')) $('editTotalSlots').value = '';
+      if ($('editTournamentNotice')) $('editTournamentNotice').value = '';
+      if ($('editRules')) $('editRules').value = '';
+      if ($('editTournamentMeta')) $('editTournamentMeta').textContent = '';
+    };
+
+    const loadEditTournamentForm = () => {
+      const id = $('editTournamentSelect')?.value || '';
+      const form = $('editTournamentForm');
+      if (!form) return;
+      if (!id) {
+        form.classList.add('hidden');
+        return;
+      }
+      const t = adminTournamentsCache.find((x) => String(x._id) === String(id));
+      if (!t) {
+        form.classList.add('hidden');
+        showToast('Error', 'Tournament not found. Refresh the admin list.', '✕');
+        return;
+      }
+      form.classList.remove('hidden');
+      if ($('editMatchTitle')) $('editMatchTitle').value = t.matchTitle || '';
+      if ($('editMatchMap')) $('editMatchMap').value = t.mapName || 'Bermuda';
+      if ($('editEntryFee')) $('editEntryFee').value = t.entryFee || '';
+      if ($('editPrizePool')) $('editPrizePool').value = t.prizePool || '';
+      if ($('editTotalSlots')) $('editTotalSlots').value = String(t.totalSlots || 1);
+      if ($('editTournamentNotice')) $('editTournamentNotice').value = t.notice || '';
+      if ($('editRules')) $('editRules').value = t.rules || '';
+      if ($('editPublishNow')) $('editPublishNow').checked = t.isPublished !== false;
+      if ($('editTournamentMeta')) {
+        $('editTournamentMeta').textContent = `Registered: ${Number(t.filledSlots || 0)} / ${Number(t.totalSlots || 0)} players`;
+      }
+    };
+
+    const updateTournament = async () => {
+      const user = getCurrentUser();
+      if (!user || !user.isAdmin) return;
+      const tournamentId = $('editTournamentSelect')?.value || '';
+      if (!tournamentId) {
+        showToast('Error', 'Select a tournament to edit.', '✕');
+        return;
+      }
+      const payload = {
+        matchTitle: ($('editMatchTitle')?.value || '').trim(),
+        mapName: $('editMatchMap')?.value || 'Bermuda',
+        entryFee: ($('editEntryFee')?.value || '').trim(),
+        prizePool: ($('editPrizePool')?.value || '').trim(),
+        totalSlots: Number($('editTotalSlots')?.value || 0),
+        rules: ($('editRules')?.value || '').trim() || 'Standard Rules Apply',
+        notice: ($('editTournamentNotice')?.value || '').trim(),
+        isPublished: !!($('editPublishNow')?.checked)
+      };
+      if (!payload.matchTitle || !payload.entryFee || !payload.prizePool || payload.totalSlots <= 0) {
+        showToast('Error', 'Fill all required tournament fields.', '✕');
+        return;
+      }
+      const btn = $('updateTournamentBtn');
+      setButtonLoading(btn, true, 'Updating...');
+      try {
+        const res = await apiFetch(`/tournaments/${tournamentId}`, {
+          method: 'PUT',
+          headers: authHeaders(),
+          body: JSON.stringify(payload)
+        });
+        const data = await parseResponse(res);
+        if (!res.ok) {
+          showToast('Error', data.message || 'Update failed', '✕');
+          return;
+        }
+        showToast('Updated', data.message || 'Tournament updated', '✓');
+        await refreshAllTournamentLists();
+        if ($('editTournamentSelect')) $('editTournamentSelect').value = tournamentId;
+        loadEditTournamentForm();
+      } catch (err) {
+        log.error('updateTournament failed:', err);
+        showToast('Error', 'Failed to update tournament.', '✕');
+      } finally {
+        setButtonLoading(btn, false);
+      }
+    };
+
+    const deleteEditTournament = async () => {
+      const tournamentId = $('editTournamentSelect')?.value || '';
+      if (!tournamentId) {
+        showToast('Error', 'Select a tournament to delete.', '✕');
+        return;
+      }
+      const btn = $('deleteEditTournamentBtn');
+      await deleteTournament(tournamentId, btn);
+      clearEditTournamentForm();
+    };
+
     const deleteTournament = async (tournamentId, button) => {
-      if (!window.confirm('Delete this tournament?')) return;
+      if (!window.confirm('Delete this tournament? This cannot be undone.')) return;
       setButtonLoading(button, true, 'Deleting...');
       try {
         const res = await apiFetch(`/tournaments/${tournamentId}`, {
@@ -1210,8 +2323,13 @@
           return;
         }
         showToast('Deleted', data.message || 'Tournament deleted', '✓');
-        fetchTournaments();
-        if (adminPanelOpen) fetchAdminTournaments();
+        if (featuredTournament && String(featuredTournament._id) === String(tournamentId)) {
+          featuredTournament = null;
+        }
+        if ($('editTournamentSelect')?.value === String(tournamentId)) {
+          clearEditTournamentForm();
+        }
+        await refreshAllTournamentLists();
       } catch (err) {
         log.error('deleteTournament failed:', err);
         showToast('Error', 'Delete failed.', '✕');
@@ -1220,11 +2338,55 @@
       }
     };
 
-    const openJoinModal = (tournamentId, title) => {
+    const parseEntryFeeRupees = (entryFeeStr) => {
+      if (!entryFeeStr || String(entryFeeStr).toLowerCase().includes('free')) return 0;
+      const m = String(entryFeeStr).match(/\d+/);
+      return m ? parseInt(m[0], 10) : 0;
+    };
+
+    const calcRequiredCoins = (rupees) => {
+      if (!rupees || rupees <= 0) return 0;
+      return Math.ceil(rupees / coinRate);
+    };
+
+    const updateJoinPaymentUI = () => {
+      const section = $('joinPaymentSection');
+      const feeSummary = $('joinFeeSummary');
+      const coinsLabel = $('joinPayCoinsLabel');
+      const coinsText = $('joinPayCoinsText');
+      const walletRadio = document.querySelector('input[name="joinPayment"][value="wallet"]');
+      if (!section) return;
+
+      if (activeJoinEntryFeeRupees <= 0) {
+        section.classList.add('hidden');
+        if (walletRadio) walletRadio.checked = true;
+        return;
+      }
+
+      section.classList.remove('hidden');
+      if (feeSummary) {
+        feeSummary.textContent = `Entry: ₹${activeJoinEntryFeeRupees} or ${activeJoinRequiredCoins} coins`;
+      }
+      const canPayCoins = coinsBalance >= activeJoinRequiredCoins && activeJoinRequiredCoins > 0;
+      if (coinsLabel) coinsLabel.classList.toggle('hidden', !canPayCoins);
+      if (coinsText) {
+        coinsText.textContent = `Pay with ${activeJoinRequiredCoins} coins (you have ${coinsBalance})`;
+      }
+      if (!canPayCoins && document.querySelector('input[name="joinPayment"][value="coins"]')?.checked && walletRadio) {
+        walletRadio.checked = true;
+      }
+    };
+
+    const openJoinModal = (tournamentId, title, entryFee) => {
       activeJoinTournamentId = tournamentId;
+      activeJoinEntryFeeRupees = parseEntryFeeRupees(entryFee || '');
+      activeJoinRequiredCoins = calcRequiredCoins(activeJoinEntryFeeRupees);
       if ($('joinModalTitle')) $('joinModalTitle').textContent = `Join: ${title}`;
       if ($('joinIgn')) $('joinIgn').value = '';
       if ($('joinUid')) $('joinUid').value = '';
+      const walletRadio = document.querySelector('input[name="joinPayment"][value="wallet"]');
+      if (walletRadio) walletRadio.checked = true;
+      updateJoinPaymentUI();
       openModal('joinModal');
     };
     window.openJoinModal = openJoinModal;
@@ -1238,11 +2400,13 @@
       }
       const btn = $('joinConfirmBtn');
       setButtonLoading(btn, true, 'Joining...');
+      const payWithCoins = document.querySelector('input[name="joinPayment"]:checked')?.value === 'coins';
+
       try {
         const res = await apiFetch(`/tournaments/${activeJoinTournamentId}/join`, {
           method: 'POST',
           headers: authHeaders(),
-          body: JSON.stringify({ ign, uid })
+          body: JSON.stringify({ ign, uid, payWithCoins: !!payWithCoins })
         });
         const data = await parseResponse(res);
         if (!res.ok) {
@@ -1250,9 +2414,12 @@
           return;
         }
         showToast('Joined', data.message || 'Registered successfully', '✓');
+        if (data.coinsBalance !== undefined) coinsBalance = Number(data.coinsBalance);
         closeModal('joinModal');
         fetchTournaments();
+        fetchFeaturedTournament();
         fetchWallet();
+        fetchReferralInfo();
       } catch (err) {
         log.error('confirmJoin failed:', err);
         showToast('Error', 'Failed to join tournament.', '✕');
@@ -1275,6 +2442,192 @@
       } catch (err) {
         log.error('fetchWallet failed:', err);
         showToast('Error', 'Failed to fetch wallet.', '✕');
+      }
+    };
+
+    const getPendingReferralCode = () => {
+      try {
+        return (sessionStorage.getItem(REFERRAL_PENDING_KEY) || '').trim().toUpperCase();
+      } catch {
+        return '';
+      }
+    };
+
+    const captureReferralFromUrl = () => {
+      try {
+        const ref = new URLSearchParams(window.location.search).get('ref');
+        if (!ref) return;
+        const code = ref.trim().toUpperCase();
+        sessionStorage.setItem(REFERRAL_PENDING_KEY, code);
+        if ($('signupReferralInput')) $('signupReferralInput').value = code;
+        if ($('signupReferralHint')) {
+          $('signupReferralHint').textContent = `Referral code applied: ${code}`;
+          $('signupReferralHint').classList.remove('hidden');
+        }
+        toggleAuthTab('signup');
+      } catch (_) {}
+    };
+
+    const fetchReferralConfig = async () => {
+      try {
+        const res = await apiFetch('/referral/config', { method: 'GET' });
+        const data = await parseResponse(res);
+        if (!res.ok) return;
+        referralCoinsReward = Number(data.referralCoins) || 100;
+        coinRate = Number(data.coinRate) || 0.2;
+        if ($('referralRewardText')) $('referralRewardText').textContent = String(referralCoinsReward);
+        if ($('referralRewardRupees')) $('referralRewardRupees').textContent = String(Math.round(referralCoinsReward * coinRate));
+        if ($('coinRateDisplay')) $('coinRateDisplay').textContent = coinRate.toFixed(2);
+      } catch (err) {
+        log.error('fetchReferralConfig failed:', err);
+      }
+    };
+
+    const fetchReferralInfo = async () => {
+      const user = getCurrentUser();
+      if (!user) return;
+      try {
+        const res = await apiFetch('/user/referral-info', { method: 'GET', headers: authHeaders() });
+        const data = await parseResponse(res);
+        if (!res.ok) return;
+        coinsBalance = Number(data.coins ?? data.coinsBalance) || 0;
+        coinRate = Number(data.coinRate) || coinRate;
+        referralCoinsReward = Number(data.referralCoinsReward) || referralCoinsReward;
+        if ($('coinsBalance')) $('coinsBalance').textContent = String(coinsBalance);
+        if ($('referralLinkInput')) $('referralLinkInput').value = data.referralLink || '';
+        if ($('referralCodeDisplay')) $('referralCodeDisplay').textContent = data.referralCode || '—';
+        if ($('referralCountDisplay')) $('referralCountDisplay').textContent = String(data.referralCount ?? 0);
+        if ($('referralRewardText')) $('referralRewardText').textContent = String(referralCoinsReward);
+        if ($('referralRewardRupees')) $('referralRewardRupees').textContent = String(Math.round(referralCoinsReward * coinRate));
+        if ($('coinRateDisplay')) $('coinRateDisplay').textContent = Number(data.coinRate || coinRate).toFixed(2);
+        const referredEl = $('referredUsersList');
+        if (referredEl) {
+          const list = Array.isArray(data.referredUsers) ? data.referredUsers : [];
+          if (!list.length) {
+            referredEl.innerHTML = '<p class="text-slate-500">No referred users yet.</p>';
+          } else {
+            referredEl.innerHTML = list.map((u) => `
+              <div class="border-b border-slate-800 pb-2">
+                <p class="font-semibold text-slate-200">${escapeHtml(u.name)}</p>
+                <p class="text-slate-500">${escapeHtml(u.email)}</p>
+                <p class="text-[10px] text-slate-600">${u.joinedAt ? new Date(u.joinedAt).toLocaleDateString() : ''}</p>
+              </div>
+            `).join('');
+          }
+        }
+        if (user && data.referralCode) {
+          const stored = getCurrentUser();
+          if (stored) setCurrentUser({ user: { ...stored, coins: coinsBalance, referralCode: data.referralCode }, token: stored.token });
+        }
+      } catch (err) {
+        log.error('fetchReferralInfo failed:', err);
+      }
+    };
+
+    const fetchPublicReferralLeaderboard = async () => {
+      const el = $('referralLeaderboardPublic');
+      if (!el) return;
+      try {
+        const res = await apiFetch('/referral-leaderboard?limit=5', { method: 'GET' });
+        const rows = await parseResponse(res);
+        if (!res.ok || !Array.isArray(rows) || rows.length === 0) {
+          el.innerHTML = '<p class="text-slate-500">No referrers yet — be the first!</p>';
+          return;
+        }
+        el.innerHTML = rows.map((r) => `
+          <div class="flex justify-between items-center gap-2 border-b border-slate-800/80 pb-2">
+            <span><span class="text-amber-400 font-bold">#${escapeHtml(r.rank)}</span> ${escapeHtml(r.name)}</span>
+            <span class="text-right text-[10px]">
+              <span class="text-emerald-400 font-semibold block">${escapeHtml(r.referralCount)} refs</span>
+              <span class="text-amber-300">🪙 ${escapeHtml(r.coins ?? r.coinsEarned)}</span>
+            </span>
+          </div>
+        `).join('');
+      } catch (err) {
+        log.error('fetchPublicReferralLeaderboard failed:', err);
+        el.innerHTML = '<p class="text-slate-500">Unable to load leaderboard.</p>';
+      }
+    };
+
+    const fetchAdminReferralLeaderboard = async () => {
+      const table = $('adminReferralTable');
+      if (!table) return;
+      try {
+        const res = await apiFetch('/admin/referral-stats?limit=25', { method: 'GET', headers: authHeaders() });
+        const rows = await parseResponse(res);
+        if (!res.ok || !Array.isArray(rows) || rows.length === 0) {
+          table.innerHTML = '<tr><td colspan="5" class="p-3 text-slate-500">No referral data yet.</td></tr>';
+          return;
+        }
+        table.innerHTML = rows.map((r) => `
+          <tr class="border-t border-slate-800">
+            <td class="p-2">${escapeHtml(r.rank)}</td>
+            <td class="p-2 font-semibold">${escapeHtml(r.name)}</td>
+            <td class="p-2 text-amber-300">${escapeHtml(r.referralCode)}</td>
+            <td class="p-2">${escapeHtml(r.referralCount)}</td>
+            <td class="p-2">${escapeHtml(r.coins)}</td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        log.error('fetchAdminReferralLeaderboard failed:', err);
+      }
+    };
+
+    const fetchAdminReferralSettings = async () => {
+      try {
+        const res = await apiFetch('/admin/referral-settings', { method: 'GET', headers: authHeaders() });
+        const data = await parseResponse(res);
+        if (!res.ok) return;
+        if ($('adminReferralCoins')) $('adminReferralCoins').value = String(data.referralCoins ?? '');
+        if ($('adminCoinRate')) $('adminCoinRate').value = String(data.coinRate ?? '');
+      } catch (err) {
+        log.error('fetchAdminReferralSettings failed:', err);
+      }
+    };
+
+    const saveAdminReferralSettings = async () => {
+      const referralCoins = parseInt($('adminReferralCoins')?.value || '0', 10);
+      const coinRate = parseFloat($('adminCoinRate')?.value || '0');
+      if (!referralCoins || referralCoins < 1 || !coinRate || coinRate <= 0) {
+        showToast('Error', 'Enter valid positive referral coins and coin rate.', '✕');
+        return;
+      }
+      const btn = $('saveReferralSettingsBtn');
+      setButtonLoading(btn, true, 'Saving...');
+      try {
+        const res = await apiFetch('/admin/referral-settings', {
+          method: 'PUT',
+          headers: authHeaders(),
+          body: JSON.stringify({ referralCoins, coinRate })
+        });
+        const data = await parseResponse(res);
+        if (!res.ok) {
+          showToast('Error', data.message || 'Save failed', '✕');
+          return;
+        }
+        showToast('Saved', data.message || 'Referral settings updated', '✓');
+        await fetchReferralConfig();
+        fetchReferralInfo();
+        fetchPublicReferralLeaderboard();
+      } catch (err) {
+        log.error('saveAdminReferralSettings failed:', err);
+        showToast('Error', 'Could not save settings.', '✕');
+      } finally {
+        setButtonLoading(btn, false);
+      }
+    };
+
+    const copyReferralLink = async () => {
+      const link = ($('referralLinkInput')?.value || '').trim();
+      if (!link) {
+        showToast('Referral', 'Link not ready yet.', '✕');
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(link);
+        showToast('Copied', 'Referral link copied!', '✓');
+      } catch {
+        showToast('Referral link', link, 'i');
       }
     };
 
@@ -1427,6 +2780,178 @@
       $('adminPanel')?.classList.add('hidden');
       if ($('adminPanelBtn')) $('adminPanelBtn').textContent = '👑 Admin';
       adminPanelOpen = false;
+      stopAdminNotificationListRefresh();
+    };
+
+    const formatNotificationTime = (iso) => {
+      if (!iso) return '—';
+      try {
+        return new Date(iso).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' });
+      } catch {
+        return String(iso);
+      }
+    };
+
+    const notificationStatusClass = (status) => {
+      if (status === 'completed') return 'text-emerald-400';
+      if (status === 'failed') return 'text-rose-400';
+      return 'text-amber-300';
+    };
+
+    const notificationTypeLabel = (type) => (type === 'deposit' ? 'Deposit' : 'Withdrawal');
+
+    const fetchAdminNotifications = async () => {
+      const user = getCurrentUser();
+      if (!user || !user.isAdmin) return;
+      try {
+        const res = await apiFetch('/admin/notifications', { method: 'GET', headers: authHeaders() });
+        const rows = await parseResponse(res);
+        const table = $('adminNotificationsTable');
+        if (!table) return;
+
+        if (!Array.isArray(rows) || !rows.length) {
+          table.innerHTML = '<tr><td colspan="7" class="p-3 text-slate-500">No transaction notifications yet.</td></tr>';
+          return;
+        }
+
+        table.innerHTML = rows.map((n) => {
+          const id = n.id || n._id;
+          const unread = !n.read;
+          return `
+          <tr class="border-b border-slate-800 ${unread ? 'bg-cyan-500/5' : ''}">
+            <td class="p-2">
+              <div class="font-semibold text-slate-200">${escapeHtml(n.userName || 'User')}</div>
+              <div class="text-[10px] text-slate-500">UID ${escapeHtml(n.userUid || '—')}</div>
+            </td>
+            <td class="p-2">${escapeHtml(notificationTypeLabel(n.type))}</td>
+            <td class="p-2 font-semibold text-emerald-300">₹${escapeHtml(n.amount)}</td>
+            <td class="p-2">₹${escapeHtml(n.newBalance)}</td>
+            <td class="p-2 capitalize ${notificationStatusClass(n.status)}">${escapeHtml(n.status || 'pending')}</td>
+            <td class="p-2 text-[10px] text-slate-400 whitespace-nowrap">${escapeHtml(formatNotificationTime(n.createdAt))}</td>
+            <td class="p-2">
+              ${unread
+                ? `<button type="button" class="notif-read-btn bg-cyan-600/80 hover:bg-cyan-500 text-white px-2 py-1 rounded text-[10px]" data-id="${escapeHtml(id)}">Mark read</button>`
+                : '<span class="text-slate-600 text-[10px]">Read</span>'}
+            </td>
+          </tr>`;
+        }).join('');
+      } catch (err) {
+        log.error('fetchAdminNotifications failed:', err);
+      }
+    };
+
+    const pollAdminNotificationsForToast = async () => {
+      const user = getCurrentUser();
+      if (!user?.isAdmin) return;
+      try {
+        const res = await apiFetch('/admin/notifications?unread=true', { method: 'GET', headers: authHeaders() });
+        const rows = await parseResponse(res);
+        if (!Array.isArray(rows)) return;
+
+        if (!adminNotificationsInitialized) {
+          rows.forEach((n) => seenAdminNotificationIds.add(String(n.id || n._id)));
+          adminNotificationsInitialized = true;
+          return;
+        }
+
+        for (const n of rows) {
+          const id = String(n.id || n._id);
+          if (seenAdminNotificationIds.has(id)) continue;
+          seenAdminNotificationIds.add(id);
+          const typeLabel = notificationTypeLabel(n.type);
+          const statusLabel = n.status ? ` · ${n.status}` : '';
+          showToast(
+            `New ${typeLabel}`,
+            `${n.userName || 'User'} (UID ${n.userUid || '—'}) · ₹${n.amount} · Wallet ₹${n.newBalance}${statusLabel}`,
+            n.type === 'deposit' ? '💰' : '↗'
+          );
+          if (adminPanelOpen) fetchAdminNotifications();
+        }
+      } catch (err) {
+        log.error('pollAdminNotificationsForToast failed:', err);
+      }
+    };
+
+    const stopAdminNotificationListRefresh = () => {
+      if (adminNotificationListTimer) {
+        clearInterval(adminNotificationListTimer);
+        adminNotificationListTimer = null;
+      }
+    };
+
+    const startAdminNotificationListRefresh = () => {
+      stopAdminNotificationListRefresh();
+      fetchAdminNotifications();
+      adminNotificationListTimer = setInterval(fetchAdminNotifications, 15000);
+    };
+
+    const stopAdminNotificationPolling = () => {
+      if (adminNotificationToastTimer) {
+        clearInterval(adminNotificationToastTimer);
+        adminNotificationToastTimer = null;
+      }
+      stopAdminNotificationListRefresh();
+      adminNotificationsInitialized = false;
+      seenAdminNotificationIds.clear();
+    };
+
+    const startAdminNotificationPolling = () => {
+      const user = getCurrentUser();
+      if (!user?.isAdmin) return;
+      if (adminNotificationToastTimer) return;
+      adminNotificationsInitialized = false;
+      pollAdminNotificationsForToast();
+      adminNotificationToastTimer = setInterval(pollAdminNotificationsForToast, 10000);
+    };
+
+    const markAdminNotificationRead = async (notificationId, button) => {
+      if (!notificationId) return;
+      setButtonLoading(button, true, '...');
+      try {
+        const res = await apiFetch(`/admin/notifications/${notificationId}/read`, {
+          method: 'PUT',
+          headers: authHeaders()
+        });
+        const data = await parseResponse(res);
+        if (!res.ok) {
+          showToast('Error', data.message || 'Could not mark as read.', '✕');
+          return;
+        }
+        fetchAdminNotifications();
+      } catch (err) {
+        log.error('markAdminNotificationRead failed:', err);
+        showToast('Error', 'Could not mark notification as read.', '✕');
+      } finally {
+        setButtonLoading(button, false);
+      }
+    };
+
+    const clearAllAdminNotifications = async () => {
+      const user = getCurrentUser();
+      if (!user?.isAdmin) return;
+      if (!confirm('Clear all transaction notifications?')) return;
+      const btn = $('clearAdminNotificationsBtn');
+      setButtonLoading(btn, true, 'Clearing...');
+      try {
+        const res = await apiFetch('/admin/notifications', {
+          method: 'DELETE',
+          headers: authHeaders()
+        });
+        const data = await parseResponse(res);
+        if (!res.ok) {
+          showToast('Error', data.message || 'Could not clear notifications.', '✕');
+          return;
+        }
+        seenAdminNotificationIds.clear();
+        adminNotificationsInitialized = false;
+        showToast('Cleared', data.message || 'Notifications cleared.', '✓');
+        fetchAdminNotifications();
+      } catch (err) {
+        log.error('clearAllAdminNotifications failed:', err);
+        showToast('Error', 'Could not clear notifications.', '✕');
+      } finally {
+        setButtonLoading(btn, false);
+      }
     };
 
     const toggleAdminPanel = () => {
@@ -1438,18 +2963,108 @@
       fetchAdminWithdrawals();
       fetchAdminParticipants();
       fetchAdminTournaments();
+      fetchAdminReferralLeaderboard();
+      fetchAdminReferralSettings();
+      fetchLiveStream();
       populateTournamentSelects();
+      populateFeaturedTournamentSelect();
+      startAdminNotificationListRefresh();
+      if (!$('prizeWinnerRows')?.querySelector('.prize-row')) {
+        resetPrizeWinnerRows(DEFAULT_PRIZE_WINNER_ROWS);
+      } else {
+        updatePrizeRowControls();
+      }
     };
 
     const populateTournamentSelects = () => {
       const roomSelect = $('roomTournamentSelect');
       const prizeSelect = $('prizeTournamentSelect');
-      if (!roomSelect || !prizeSelect) return;
+      const noticeSelect = $('noticeTournamentSelect');
+      const editSelect = $('editTournamentSelect');
       const user = getCurrentUser();
       const source = (user && user.isAdmin && adminTournamentsCache.length) ? adminTournamentsCache : tournaments;
-      const options = `<option value="">Select Tournament</option>${source.map((t) => `<option value="${t._id}">${escapeHtml(t.matchTitle)}</option>`).join('')}`;
-      roomSelect.innerHTML = options;
-      prizeSelect.innerHTML = options;
+      const options = `<option value="">Select Tournament</option>${source.map((t) => {
+        const label = `${t.matchTitle} — ${t.entryFee || 'Free'}`;
+        return `<option value="${t._id}">${escapeHtml(label)}</option>`;
+      }).join('')}`;
+      const editOptions = `<option value="">Select tournament to edit</option>${(adminTournamentsCache.length ? adminTournamentsCache : source).map((t) => {
+        const pub = t.isPublished === false ? ' [Unpublished]' : '';
+        const label = `${t.matchTitle} — ${t.entryFee || 'Free'}${pub}`;
+        return `<option value="${t._id}">${escapeHtml(label)}</option>`;
+      }).join('')}`;
+      if (roomSelect) roomSelect.innerHTML = options;
+      if (prizeSelect) prizeSelect.innerHTML = options;
+      if (noticeSelect) {
+        const prev = noticeSelect.value;
+        noticeSelect.innerHTML = options;
+        if (prev) noticeSelect.value = prev;
+        loadNoticeForSelectedTournament();
+      }
+      if (editSelect) {
+        const prevEdit = editSelect.value;
+        editSelect.innerHTML = editOptions;
+        if (prevEdit && source.some((t) => String(t._id) === String(prevEdit))) {
+          editSelect.value = prevEdit;
+          loadEditTournamentForm();
+        } else if (!prevEdit) {
+          $('editTournamentForm')?.classList.add('hidden');
+        }
+      }
+      populateFeaturedTournamentSelect();
+    };
+
+    const loadNoticeForSelectedTournament = () => {
+      const id = $('noticeTournamentSelect')?.value || '';
+      const textarea = $('noticeTournamentText');
+      if (!textarea) return;
+      if (!id) {
+        textarea.value = '';
+        return;
+      }
+      const user = getCurrentUser();
+      const source = (user?.isAdmin && adminTournamentsCache.length) ? adminTournamentsCache : tournaments;
+      const t = source.find((x) => String(x._id) === String(id));
+      textarea.value = t?.notice || '';
+    };
+
+    const saveTournamentNoticeFromForm = async () => {
+      const user = getCurrentUser();
+      if (!user || !user.isAdmin) return;
+      const tournamentId = $('noticeTournamentSelect')?.value || '';
+      const notice = ($('noticeTournamentText')?.value || '').trim();
+      if (!tournamentId) {
+        showToast('Error', 'Select a tournament first.', '✕');
+        return;
+      }
+      const btn = $('saveTournamentNoticeBtn');
+      setButtonLoading(btn, true, 'Saving...');
+      try {
+        const res = await apiFetch(`/tournaments/${tournamentId}/notice`, {
+          method: 'PUT',
+          headers: authHeaders(),
+          body: JSON.stringify({ notice })
+        });
+        const data = await parseResponse(res);
+        if (!res.ok) {
+          showToast('Error', data.message || 'Could not save notice.', '✕');
+          return;
+        }
+        showToast('Saved', 'Tournament notice updated', '✓');
+        const idx = adminTournamentsCache.findIndex((t) => String(t._id) === String(tournamentId));
+        if (idx >= 0) adminTournamentsCache[idx].notice = notice;
+        const tIdx = tournaments.findIndex((t) => String(t._id) === String(tournamentId));
+        if (tIdx >= 0) tournaments[tIdx].notice = notice;
+        if (featuredTournament && String(featuredTournament._id) === String(tournamentId)) {
+          featuredTournament.notice = notice;
+          renderFeaturedTournament();
+        }
+        renderTournaments();
+      } catch (err) {
+        log.error('saveTournamentNoticeFromForm failed:', err);
+        showToast('Error', 'Failed to save notice.', '✕');
+      } finally {
+        setButtonLoading(btn, false);
+      }
     };
 
     const renderAdminTournaments = () => {
@@ -1631,6 +3246,7 @@
         }
         showToast('Updated', data.message || 'Deposit updated', '✓');
         fetchAdminDeposits();
+        fetchAdminNotifications();
         fetchWallet();
       } catch (err) {
         log.error('handleDepositAction failed:', err);
@@ -1655,6 +3271,7 @@
         }
         showToast('Updated', data.message || 'Withdrawal updated', '✓');
         fetchAdminWithdrawals();
+        fetchAdminNotifications();
         fetchWallet();
       } catch (err) {
         log.error('handleWithdrawAction failed:', err);
@@ -1672,6 +3289,7 @@
         prizePool: ($('prizePool')?.value || '').trim(),
         totalSlots: Number($('totalSlots')?.value || 0),
         rules: ($('rules')?.value || '').trim() || 'Standard Rules Apply',
+        notice: ($('tournamentNotice')?.value || '').trim(),
         isPublished: !!($('publishNow')?.checked)
       };
       if (!payload.matchTitle || !payload.entryFee || !payload.prizePool || payload.totalSlots <= 0) {
@@ -1692,14 +3310,103 @@
           return;
         }
         showToast('Created', 'Tournament created.', '✓');
-        fetchTournaments();
-        if (adminPanelOpen) fetchAdminTournaments();
+        if ($('tournamentNotice')) $('tournamentNotice').value = '';
+        await refreshAllTournamentLists();
       } catch (err) {
         log.error('createTournament failed:', err);
         showToast('Error', 'Create tournament failed.', '✕');
       } finally {
         setButtonLoading(btn, false);
       }
+    };
+
+    const createPrizeWinnerRowElement = () => {
+      const row = document.createElement('div');
+      row.className = 'prize-row grid grid-cols-2 md:grid-cols-4 gap-2';
+      row.innerHTML = `
+        <input type="number" min="1" class="rank bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" placeholder="Rank" aria-label="Rank">
+        <input type="text" class="ign bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" placeholder="IGN" aria-label="IGN">
+        <input type="text" class="uid bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" placeholder="UID" aria-label="UID">
+        <input type="number" min="1" step="0.01" class="prizeAmount bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm" placeholder="Prize ₹" aria-label="Prize amount">
+      `;
+      return row;
+    };
+
+    const getPrizeWinnerRowCount = () => document.querySelectorAll('#prizeWinnerRows .prize-row').length;
+
+    const updatePrizeRowControls = () => {
+      const count = getPrizeWinnerRowCount();
+      const counter = $('prizeRowCount');
+      if (counter) counter.textContent = `${count} / ${MAX_PRIZE_WINNER_ROWS} rows`;
+      const addBtn = $('addPrizeWinnerBtn');
+      const removeBtn = $('removePrizeWinnerBtn');
+      if (addBtn) {
+        addBtn.disabled = count >= MAX_PRIZE_WINNER_ROWS;
+        addBtn.classList.toggle('opacity-50', addBtn.disabled);
+        addBtn.classList.toggle('cursor-not-allowed', addBtn.disabled);
+      }
+      if (removeBtn) {
+        removeBtn.disabled = count <= MIN_PRIZE_WINNER_ROWS;
+        removeBtn.classList.toggle('opacity-50', removeBtn.disabled);
+        removeBtn.classList.toggle('cursor-not-allowed', removeBtn.disabled);
+      }
+    };
+
+    const resetPrizeWinnerRows = (count = DEFAULT_PRIZE_WINNER_ROWS) => {
+      const container = $('prizeWinnerRows');
+      if (!container) return;
+      const rowCount = Math.min(Math.max(count, MIN_PRIZE_WINNER_ROWS), MAX_PRIZE_WINNER_ROWS);
+      container.innerHTML = '';
+      for (let i = 0; i < rowCount; i += 1) {
+        container.appendChild(createPrizeWinnerRowElement());
+      }
+      updatePrizeRowControls();
+    };
+
+    const addPrizeWinnerRow = () => {
+      const container = $('prizeWinnerRows');
+      if (!container) return;
+      if (getPrizeWinnerRowCount() >= MAX_PRIZE_WINNER_ROWS) {
+        showToast('Limit reached', 'Maximum 20 winners allowed', '✕');
+        return;
+      }
+      container.appendChild(createPrizeWinnerRowElement());
+      updatePrizeRowControls();
+      container.lastElementChild?.querySelector('.rank')?.focus();
+    };
+
+    const removeLastPrizeWinnerRow = () => {
+      const container = $('prizeWinnerRows');
+      if (!container) return;
+      if (getPrizeWinnerRowCount() <= MIN_PRIZE_WINNER_ROWS) return;
+      container.lastElementChild?.remove();
+      updatePrizeRowControls();
+    };
+
+    const collectPrizeWinnersFromForm = () => {
+      const rows = document.querySelectorAll('#prizeWinnerRows .prize-row');
+      const winners = [];
+      for (const row of rows) {
+        const rankRaw = (row.querySelector('.rank')?.value || '').trim();
+        const ign = (row.querySelector('.ign')?.value || '').trim();
+        const uid = (row.querySelector('.uid')?.value || '').trim();
+        const prizeRaw = (row.querySelector('.prizeAmount')?.value || '').trim();
+        const filledCount = [rankRaw, ign, uid, prizeRaw].filter(Boolean).length;
+        if (filledCount === 0) continue;
+        if (filledCount < 4) {
+          return { error: 'Each winner row must have Rank, IGN, UID, and Prize ₹ filled (or leave the row empty).' };
+        }
+        const rank = Number(rankRaw);
+        const prizeAmount = Number(prizeRaw);
+        if (!Number.isFinite(rank) || rank < 1 || !ign || !uid || !Number.isFinite(prizeAmount) || prizeAmount <= 0) {
+          return { error: 'Check rank (≥1), IGN, UID, and prize amount (> 0) in every filled row.' };
+        }
+        winners.push({ rank, ign, uid, prizeAmount });
+      }
+      if (!winners.length) {
+        return { error: 'Add at least one complete winner row before distributing.' };
+      }
+      return { winners };
     };
 
     const saveRoomCredentials = async () => {
@@ -1737,18 +3444,12 @@
         return;
       }
 
-      const winners = [];
-      document.querySelectorAll('.prize-row').forEach((row) => {
-        const rank = Number(row.querySelector('.rank')?.value || 0);
-        const ign = (row.querySelector('.ign')?.value || '').trim();
-        const uid = (row.querySelector('.uid')?.value || '').trim();
-        const prizeAmount = Number(row.querySelector('.prizeAmount')?.value || 0);
-        if (rank > 0 && ign && uid && prizeAmount > 0) winners.push({ rank, ign, uid, prizeAmount });
-      });
-      if (!winners.length) {
-        showToast('Error', 'Enter at least one winner row.', '✕');
+      const collected = collectPrizeWinnersFromForm();
+      if (collected.error) {
+        showToast('Error', collected.error, '✕');
         return;
       }
+      const { winners } = collected;
 
       const btn = $('distributeBtn');
       setButtonLoading(btn, true, 'Distributing...');
@@ -1763,9 +3464,11 @@
           showToast('Error', data.message || 'Distribution failed', '✕');
           return;
         }
-        showToast('Done', data.message || 'Prizes distributed', '✓');
+        showToast('Done', `Prizes distributed to ${winners.length} winner${winners.length === 1 ? '' : 's'}`, '✓');
         fetchLeaderboard();
         fetchWinners();
+        fetchWallet();
+        resetPrizeWinnerRows(MIN_PRIZE_WINNER_ROWS);
       } catch (err) {
         log.error('distributePrizes failed:', err);
         showToast('Error', 'Prize distribution failed.', '✕');
@@ -1787,8 +3490,13 @@
     };
 
     const bindEvents = () => {
+      on('authMethodEmail', 'click', () => switchAuthMethod('email'));
+      on('authMethodPhone', 'click', () => switchAuthMethod('phone'));
       on('authTabLogin', 'click', () => toggleAuthTab('login'));
       on('authTabSignup', 'click', () => toggleAuthTab('signup'));
+      on('signupAgreeCheckbox', 'change', updateSignupButtonState);
+      on('phoneLoginForm', 'submit', handlePhoneLogin);
+      on('phoneLoginBtn', 'click', handlePhoneLogin);
 
       on('loginForm', 'submit', handleLogin);
       on('signupForm', 'submit', handleSignup);
@@ -1820,20 +3528,30 @@
       on('submitWithdrawBtn', 'click', submitWithdraw);
       on('closeWithdrawSuccessBtn', 'click', () => closeModal('withdrawSuccessModal'));
       on('joinConfirmBtn', 'click', confirmJoin);
+      on('copyReferralBtn', 'click', copyReferralLink);
+      on('saveReferralSettingsBtn', 'click', saveAdminReferralSettings);
       on('adminPanelBtn', 'click', toggleAdminPanel);
+      on('refreshAdminNotificationsBtn', 'click', fetchAdminNotifications);
+      on('clearAdminNotificationsBtn', 'click', clearAllAdminNotifications);
       on('createTournamentBtn', 'click', createTournament);
       on('refreshAdminTournamentsBtn', 'click', fetchAdminTournaments);
       on('saveRoomBtn', 'click', saveRoomCredentials);
       on('distributeBtn', 'click', distributePrizes);
+      on('addPrizeWinnerBtn', 'click', addPrizeWinnerRow);
+      on('removePrizeWinnerBtn', 'click', removeLastPrizeWinnerRow);
+      on('setFeaturedBtn', 'click', setFeaturedTournament);
+      on('removeFeaturedBtn', 'click', removeFeaturedTournament);
+      on('saveLiveStreamBtn', 'click', saveLiveStreamSettings);
+      on('deleteLiveStreamBtn', 'click', deleteLiveStream);
+      on('liveStreamLogoFile', 'change', handleLiveStreamLogoFile);
+      on('saveTournamentNoticeBtn', 'click', saveTournamentNoticeFromForm);
+      on('noticeTournamentSelect', 'change', loadNoticeForSelectedTournament);
+      on('editTournamentSelect', 'change', loadEditTournamentForm);
+      on('updateTournamentBtn', 'click', updateTournament);
+      on('deleteEditTournamentBtn', 'click', deleteEditTournament);
 
-      on('featuredRegisterBtn', 'click', () => {
-        const firstTournament = tournaments[0];
-        if (!firstTournament) {
-          showToast('No tournaments', 'No live tournament is available right now.', 'i');
-          return;
-        }
-        openJoinModal(firstTournament._id, firstTournament.matchTitle);
-      });
+      $('featuredTournamentMain')?.addEventListener('click', handleFeaturedCardClick);
+      $('featuredTournamentSidebar')?.addEventListener('click', handleFeaturedCardClick);
 
       on('apiOverrideSaveBtn', 'click', async () => {
         const raw = ($('apiOverrideInput')?.value || '').trim();
@@ -1853,7 +3571,7 @@
       // Delegated actions: tournaments + admin tables
       $('tournamentGrid')?.addEventListener('click', (e) => {
         const joinBtn = e.target.closest('.join-btn');
-        if (joinBtn) return openJoinModal(joinBtn.dataset.id, joinBtn.dataset.title || 'Tournament');
+        if (joinBtn) return openJoinModal(joinBtn.dataset.id, joinBtn.dataset.title || 'Tournament', joinBtn.dataset.entryFee);
         const roomBtn = e.target.closest('.room-btn');
         if (roomBtn) return fetchRoomCredentials(roomBtn.dataset.id);
         const deleteBtn = e.target.closest('.delete-btn');
@@ -1872,6 +3590,12 @@
         handleWithdrawAction(actionBtn.dataset.id, actionBtn.dataset.action, actionBtn);
       });
 
+      $('adminNotificationsTable')?.addEventListener('click', (e) => {
+        const readBtn = e.target.closest('.notif-read-btn');
+        if (!readBtn) return;
+        markAdminNotificationRead(readBtn.dataset.id, readBtn);
+      });
+
       $('adminTournamentsTable')?.addEventListener('click', (e) => {
         const btn = e.target.closest('.publish-toggle');
         if (!btn) return;
@@ -1887,8 +3611,22 @@
     // Initialize
     // =========================
     const initializeApp = async () => {
+      const host = window.location.hostname;
+      const isLocal = host === 'localhost' || host === '127.0.0.1';
+      if (window.location.protocol === 'http:' && !isLocal) {
+        window.location.replace(`https://${window.location.host}${window.location.pathname}${window.location.search}${window.location.hash}`);
+        return;
+      }
+      if (IS_DEV_UI) {
+        console.warn('[NEXMILL] Auth token is in localStorage — protect against XSS; use HTTPS in production.');
+      }
       if ($('footerYear')) $('footerYear').textContent = String(new Date().getFullYear());
       bindEvents();
+      captureReferralFromUrl();
+      fetchReferralConfig();
+      fetchPublicReferralLeaderboard();
+      updateSignupButtonState();
+      resetPrizeWinnerRows(DEFAULT_PRIZE_WINNER_ROWS);
 
       // Pre-fill override input (if set)
       const savedApi = localStorage.getItem(API_BASE_STORAGE_KEY);

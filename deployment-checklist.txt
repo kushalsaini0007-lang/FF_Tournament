@@ -1,0 +1,104 @@
+================================================================================
+NEXMILL ARENA — PRE-DEPLOYMENT & GO-LIVE CHECKLIST
+================================================================================
+Use this after your code audit fixes are applied and before/after buying a domain.
+
+--------------------------------------------------------------------------------
+A. LOCAL VERIFICATION (do this first)
+--------------------------------------------------------------------------------
+[ ] Copy backend/.env.example to backend/.env and fill MONGO_URI + JWT_SECRET
+[ ] Run: cd backend && npm install && npm start
+[ ] Open http://localhost:5000 — app loads, login works
+[ ] GET http://localhost:5000/api/health → {"status":"ok","db":"connected"}
+[ ] Confirm myqr.png exists in frontend/ (same folder as index.html)
+[ ] Test deposit flow, withdrawal flow, tournament join (smoke test)
+[ ] Admin login works (set ADMIN_SEED_PASSWORD locally or use dev default)
+
+--------------------------------------------------------------------------------
+B. MONGODB ATLAS (production database)
+--------------------------------------------------------------------------------
+[ ] Create MongoDB Atlas cluster (M10+ recommended for ~100 concurrent users)
+[ ] Database user with strong password (not shared)
+[ ] Network access: allow Render outbound IPs OR 0.0.0.0/0 temporarily then restrict
+[ ] Connection string in Render env as MONGO_URI (URL-encode special chars in password)
+[ ] Enable backups / point-in-time recovery on Atlas
+
+--------------------------------------------------------------------------------
+C. RENDER WEB SERVICE
+--------------------------------------------------------------------------------
+[ ] Connect GitHub repo to Render
+[ ] Service type: Web Service
+[ ] Root directory: backend
+[ ] Build command: npm install
+[ ] Start command: node server.js
+[ ] Health check path: /api/health
+[ ] Instance: at least 512MB RAM (Starter OK for moderate load; scale if needed)
+
+Environment variables (Render dashboard → Environment):
+[ ] NODE_ENV=production
+[ ] MONGO_URI=<Atlas connection string>
+[ ] JWT_SECRET=<32+ char random — use Render "Generate" or openssl rand -base64 32>
+[ ] ADMIN_SEED_EMAIL=your-admin@yourdomain.com
+[ ] ADMIN_SEED_PASSWORD=<strong password — set BEFORE first deploy>
+[ ] CORS_ORIGINS=https://YOUR-SERVICE.onrender.com
+[ ] REFERRAL_COINS=100 (optional)
+[ ] COIN_RATE=0.2 (optional)
+[ ] ENABLE_DEBUG_ROUTES=false (or unset)
+[ ] Do NOT set PORT — Render injects it automatically
+
+[ ] Deploy and wait for health check green
+[ ] Visit https://YOUR-SERVICE.onrender.com and test auth + wallet
+
+--------------------------------------------------------------------------------
+D. CUSTOM DOMAIN (after purchase)
+--------------------------------------------------------------------------------
+[ ] In Render: Settings → Custom Domains → add nexmillarena.com (and www)
+[ ] At registrar: add DNS records Render provides (CNAME or A)
+[ ] Wait for SSL certificate (automatic on Render)
+[ ] Update CORS_ORIGINS to include:
+      https://nexmillarena.com,https://www.nexmillarena.com,https://YOUR-SERVICE.onrender.com
+[ ] Redeploy or save env (no code change if frontend uses same origin)
+[ ] Optional: meta api-base in index.html only if API is on a different subdomain
+
+--------------------------------------------------------------------------------
+E. SECURITY FINAL CHECKS
+--------------------------------------------------------------------------------
+[ ] .env is in .gitignore — never committed
+[ ] JWT_SECRET is unique and not the dev default
+[ ] ADMIN_SEED_PASSWORD changed from any dev default after first login
+[ ] Change admin password via DB or add change-password flow later
+[ ] ENABLE_DEBUG_ROUTES is false in production
+[ ] MongoDB IP allowlist reviewed
+[ ] Review Atlas logs for failed auth attempts after launch
+
+--------------------------------------------------------------------------------
+F. PERFORMANCE (100 concurrent users)
+--------------------------------------------------------------------------------
+[ ] Rate limits active: login 5/15min, API 100/15min, admin 60/15min
+[ ] Indexes created (tournaments createdAt, deposits/withdrawals userId+createdAt, etc.)
+[ ] mongoose maxPoolSize=10 configured
+[ ] Monitor Render CPU/memory during a busy tournament window
+[ ] Scale Render instance or enable autoscaling if response times spike
+
+--------------------------------------------------------------------------------
+G. MONITORING & OPS
+--------------------------------------------------------------------------------
+[ ] Render notifications for deploy failures / instance restarts
+[ ] Atlas alerts for disk/connections
+[ ] Bookmark /api/health for uptime checks (UptimeRobot, etc.)
+[ ] Plan: rotate JWT_SECRET only with forced re-login (rare)
+
+--------------------------------------------------------------------------------
+H. KNOWN ACCEPTED RISKS (documented)
+--------------------------------------------------------------------------------
+[ ] JWT in localStorage — XSS could steal token; CSP meta tag in index.html mitigates partly
+[ ] Use HTTPS only (Render provides TLS)
+[ ] Tailwind CDN — consider self-hosting for stricter CSP later
+
+--------------------------------------------------------------------------------
+QUICK REFERENCE — REQUIRED ENV VARS (PRODUCTION)
+--------------------------------------------------------------------------------
+MONGO_URI, JWT_SECRET, NODE_ENV=production, ADMIN_SEED_PASSWORD,
+CORS_ORIGINS (Render URL + custom domain)
+
+================================================================================
